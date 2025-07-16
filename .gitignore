@@ -1,3 +1,18 @@
+bin
+obj
+
+# VIM
+
+*.swp
+
+# Visual Studio
+
+.vs
+
+# Visual Studio Code
+
+.vscode
+
 # Prerequisites
 *.d
 
