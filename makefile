@@ -21,3 +21,12 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 .PHONY: clean
 clean:
 	-rm -rf $(OBJ_FILES) $(MAIN_EXE_PATH)
+
+.PHONY: run
+run: $(MAIN_EXE_PATH)
+	@$(MAIN_EXE_PATH)
+
+.PHONY: test
+
+test:
+	$(PYTHON) -m $(TEST_MODULE)
