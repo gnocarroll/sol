@@ -27,6 +27,5 @@ run: $(MAIN_EXE_PATH)
 	@$(MAIN_EXE_PATH)
 
 .PHONY: test
-
 test:
 	$(PYTHON) -m $(TEST_MODULE)
