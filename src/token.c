@@ -1,6 +1,10 @@
 #include "token.h"
 
+#include <stdbool.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 static const char *token_text_arr[] = {
 
