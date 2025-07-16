@@ -1,11 +1,15 @@
-TOK(PLUS, "+")
-TOK(HYPHEN, "-")
+TOK(TOK_NONE, "")
 
-TOK(STAR, "*")
-TOK(F_SLASH, "/")
-TOK(PERCENT, "%")
+TOK(TOK_PLUS, "+")
+TOK(TOK_HYPHEN, "-")
 
-TOK(STAR_STAR, "**")
+TOK(TOK_STAR, "*")
+TOK(TOK_F_SLASH, "/")
+TOK(TOK_PERCENT, "%")
 
-TOK(L_PAREN, "(")
-TOK(R_PAREN, ")")
+TOK(TOK_STAR_STAR, "**")
+
+TOK(TOK_L_PAREN, "(")
+TOK(TOK_R_PAREN, ")")
+
+TOK(TOK_COUNT, "")
