@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stddef.h>
+#include "char_stream.h"
+#include "expr.h"
 
-#include "expr_node.h"
-
-ExprNode *parse_expr(size_t n_chars, const char *s);
+OptionalExprPtr parse_expr(CharStream& cstream);
