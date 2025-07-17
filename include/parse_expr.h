@@ -4,4 +4,4 @@
 
 #include "expr_node.h"
 
-expr_node *parse_expr(size_t n_chars, const char *s);
+ExprNode *parse_expr(size_t n_chars, const char *s);

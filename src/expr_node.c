@@ -3,8 +3,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-expr_node get_expr_node() {
-    expr_node ret;
+ExprNode get_expr_node() {
+    ExprNode ret;
 
     ret.node_type = EXPR_NODE_ERR;
 
@@ -19,8 +19,8 @@ expr_node get_expr_node() {
     return ret;
 }
 
-expr_node *alloc_expr_node() {
-    expr_node *ret = calloc(1, sizeof(expr_node));
+ExprNode *alloc_expr_node() {
+    ExprNode *ret = calloc(1, sizeof(ExprNode));
 
     if (!ret) return ret;
 
@@ -29,7 +29,7 @@ expr_node *alloc_expr_node() {
     return ret;
 }
 
-void free_expr_tree(expr_node *node) {
+void free_expr_tree(ExprNode *node) {
     if (!node) return;
 
     free_expr_tree(node->lhs);

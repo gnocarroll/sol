@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum token_type {
+typedef enum TokenType {
 
 #define TOK(name, text) name ,
 
@@ -8,6 +8,6 @@ typedef enum token_type {
 
 #undef TOK
 
-} token_type;
+} TokenType;
 
-const char* get_token_text(token_type ttype);
+const char* get_token_text(TokenType ttype);

@@ -1,12 +1,12 @@
 #pragma once
 
-typedef enum operator_type {
+typedef enum OperatorType {
     OP_TYPE_NONE,
     OP_TYPE_UNARY,
     OP_TYPE_BINARY,
-} operator_type;
+} OperatorType;
 
-typedef enum operator_enum {
+typedef enum Operator {
 
 #define OP(name, tok) name ,
 
@@ -14,4 +14,4 @@ typedef enum operator_enum {
 
 #undef OP
 
-} operator_enum;
+} Operator;

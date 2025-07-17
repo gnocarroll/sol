@@ -17,7 +17,7 @@ static const char *token_text_arr[] = {
     ""
 };
 
-const char *get_token_text(token_type ttype) {
+const char *get_token_text(TokenType ttype) {
     if (ttype < 0 || ttype >= TOK_COUNT) {
         return NULL;
     }

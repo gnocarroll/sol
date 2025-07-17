@@ -2,28 +2,28 @@
 
 #include "operator.h"
 
-typedef enum expr_node_type {
+typedef enum ExprNodeType {
     EXPR_NODE_ERR,
     EXPR_NODE_LITERAL,
     EXPR_NODE_OTHER,
-} expr_node_type;
+} ExprNodeType;
 
-typedef struct expr_node {
-    expr_node_type node_type;
-    operator_type op_type;
-    operator_enum op;
+typedef struct ExprNode {
+    ExprNodeType node_type;
+    OperatorType op_type;
+    Operator op;
 
     union {
-        struct expr_node *lhs;
-        struct expr_node *child;
+        struct ExprNode *lhs;
+        struct ExprNode *child;
     };
 
-    struct expr_node *rhs;
+    struct ExprNode *rhs;
 
     int value;
-} expr_node;
+} ExprNode;
 
-expr_node get_expr_node();
+ExprNode get_expr_node();
 
-expr_node *alloc_expr_node();
-void free_expr_tree(expr_node *);
+ExprNode *alloc_expr_node();
+void free_expr_tree(ExprNode *);
