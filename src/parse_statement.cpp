@@ -1,5 +1,7 @@
 #include "parse_statement.h"
 
+#include "parse_newline.h"
+
 static OptionalStatementPtr _parse_statement(CharStream &cstream, Scope &scope);
 
 OptionalStatementPtr parse_statement(CharStream& cstream, Scope &scope) {
@@ -7,7 +9,7 @@ OptionalStatementPtr parse_statement(CharStream& cstream, Scope &scope) {
 
     if (!ret) return {};
 
-    if (!match_token(cstream, TokenType::TOK_NEWLINE)) {
+    if (!parse_one_plus_newlines(cstream)) {
         return std::make_unique<ErrStatement>();
     }
 
