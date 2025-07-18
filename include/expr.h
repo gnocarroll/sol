@@ -19,6 +19,10 @@ public:
     virtual std::optional<long> eval() = 0;
 };
 
+#define DECL_EXPR_FUNCS \
+    void print(std::ostream& ostream = std::cout); \
+    std::optional<long> eval();
+
 DEF_PTR_TYPES(Expr)
 
 class BinaryExpr final : public Expr {
@@ -30,8 +34,7 @@ public:
     BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
         lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {};
 
-    void print(std::ostream &ostream = std::cout);
-    std::optional<long> eval();
+    DECL_EXPR_FUNCS
 };
 
 class UnaryExpr final : public Expr {
@@ -42,8 +45,7 @@ public:
 
     UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {}
 
-    void print(std::ostream &ostream = std::cout);
-    std::optional<long> eval();
+    DECL_EXPR_FUNCS
 };
 
 class LiteralExpr : public Expr {
@@ -74,3 +76,5 @@ class ErrExpr final : public Expr {
         return {};
     }
 };
+
+#undef DECL_EXPR_FUNCS

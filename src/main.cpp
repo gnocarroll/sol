@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "char_stream.h"
-#include "parse_expr.h"
+#include "parse_program.h"
 
 int main(void) {
     std::string line;
@@ -10,13 +10,7 @@ int main(void) {
         std::istringstream isstream(line);
         CharStream cstream(isstream);
 
-        auto expr = parse_expr(cstream);
-        auto value = (*expr)->eval();
-
-        if (value) std::cout << *value;
-        else std::cout << "ERR";
-
-        std::cout << '\n';
+        auto program = 
     }
 
     return 0;
