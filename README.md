@@ -9,7 +9,7 @@ In this repo I want to try developing a programming language by making
 end-to-end programs from the beginning rather than working by e.g. creating
 a scanner then a parser then type checking etc.
 
-Will begin by working on a C programming that will take expressions as input
+Will begin by working on a C++ program that will take expressions as input
 on stdin and then, treating each line as a separate expression, will print
 the results on separate lines.
 
@@ -30,3 +30,5 @@ Output should be:
 2
 9
 ```
+
+Currently, this basic functionality seems to be working.
