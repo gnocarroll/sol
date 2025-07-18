@@ -40,7 +40,7 @@ FilePos CharStream::get_file_pos(size_t go_back) const {
     if (go_back == 0) return FilePos(line_no, line_start_pos(line_no));
     if (go_back > buffer_idx) go_back = buffer_idx;
 
-    return get_file_pos_from_buffer_idx(buffer_idx - go_back).line_no;
+    return get_file_pos_from_buffer_idx(buffer_idx - go_back);
 }
 
 FilePos CharStream::get_file_pos_from_buffer_idx(size_t idx) const {
