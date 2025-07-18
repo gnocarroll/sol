@@ -1,30 +1,5 @@
 #include "expr.h"
 
-#include <cmath>
-
-void BinaryExpr::print(std::ostream &ostream) {
-    ostream << '(';
-    auto ttype = op.get_token_type();
-
-    if (!ttype) ostream << "ERR";
-    else {
-        auto ttext = ttype->get_text();
-
-        if (!ttext) ostream << "ERR";
-        else ostream << *ttext;
-    }
-
-    ostream << ' ';
-
-    lhs->print(ostream);
-
-    ostream << ' ';
-
-    rhs->print(ostream);
-
-    ostream << ')';
-}
-
 std::optional<long> BinaryExpr::eval() {
     auto lhs_val = lhs->eval();
     auto rhs_val = rhs->eval();
@@ -49,25 +24,6 @@ std::optional<long> BinaryExpr::eval() {
     }
 
     return {};
-}
-
-void UnaryExpr::print(std::ostream &ostream) {
-    ostream << '(';
-    auto ttype = op.get_token_type();
-
-    if (!ttype) ostream << "ERR";
-    else {
-        auto text = ttype->get_text();
-
-        if (!text) ostream << "ERR";
-        else ostream << *text;
-    }
-
-    ostream << ' ';
-
-    sub_expr->print(ostream);
-
-    ostream << ')';
 }
 
 std::optional<long> UnaryExpr::eval() {
