@@ -56,7 +56,12 @@ public:
 
     // this last one is most useful for std::cin
     // otherwise maybe more desirable to give this ownership of istream
-    CharStream(std::istream& in_stream) : in_stream(in_stream) {}
+    CharStream(std::istream& in_stream) : in_stream(in_stream) {
+        in_stream >> std::noskipws;
+    }
+    ~CharStream() {
+        in_stream >> std::skipws;
+    }
 
     std::optional<char> getc();
     std::optional<char> peekc();

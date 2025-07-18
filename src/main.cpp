@@ -4,14 +4,11 @@
 #include "parse_program.h"
 
 int main(void) {
-    std::string line;
+    CharStream cstream(std::cin);
 
-    while (std::getline(std::cin, line)) {
-        std::istringstream isstream(line);
-        CharStream cstream(isstream);
+    auto program = parse_program(cstream);
 
-        auto program = 
-    }
+    program.execute();
 
     return 0;
 }

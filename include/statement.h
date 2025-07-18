@@ -70,4 +70,11 @@ public:
     DECL_STATEMENT_FUNCS
 };
 
+class ErrStatement final : public Statement {
+public:
+    ErrStatement();
+
+    void execute() {}
+};
+
 #undef DECL_STATEMENT_FUNCS

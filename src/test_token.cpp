@@ -5,7 +5,11 @@
 static std::optional<size_t> match_integer(CharStream &cstream);
 static std::optional<size_t> match_word(CharStream &cstream);
 
-std::optional<size_t> match_token(CharStream &cstream, TokenType ttype) {
+static void skip_ignored_ws(CharStream &cstream);
+
+std::optional<size_t> match_token(CharStream &cstream, TokenType ttype) {    
+    skip_ignored_ws(cstream);
+
     switch (ttype()) {
     case TokenType::TOK_INTEGER:
         return match_integer(cstream);
@@ -82,4 +86,21 @@ static std::optional<size_t> match_word(CharStream &cstream) {
     }
 
     return n_chars;
+}
+
+static void skip_ignored_ws(CharStream &cstream) {    
+    while (true) {
+        auto maybe_next_char = cstream.peekc();
+
+        if (!maybe_next_char) return;
+
+        char c = *maybe_next_char;
+
+        if (std::iswspace(c) && c != '\n') {
+            cstream.getc();
+            continue;
+        }
+
+        return;
+    }
 }
