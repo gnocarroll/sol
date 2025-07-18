@@ -1,5 +1,7 @@
 TOK(TOK_NONE, "")
 
+TOK(TOK_PRINT, "PRINT")
+
 TOK(TOK_PLUS, "+")
 TOK(TOK_HYPHEN, "-")
 
@@ -13,5 +15,6 @@ TOK(TOK_L_PAREN, "(")
 TOK(TOK_R_PAREN, ")")
 
 TOK(TOK_INTEGER, "")
+TOK(TOK_WORD, "")
 
 TOK(TOK_COUNT, "")

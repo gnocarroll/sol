@@ -5,6 +5,8 @@
 #include <optional>
 #include <vector>
 
+#include "expr.h"
+#include "instance.h"
 #include "macros.h"
 
 class Statement {
@@ -34,16 +36,36 @@ public:
 
 /// @brief create new instance of some type
 class CreateStatement final : public Statement {
+    Instance& instance;
+    OptionalExprPtr expr;
+
 public:
-    CreateStatement() {}
+    CreateStatement(Instance& instance) : instance(instance) {}
+    CreateStatement(Instance& instance, ExprPtr&& expr) :
+        instance(instance), expr(std::move(expr)) {}
     
     DECL_STATEMENT_FUNCS
 };
 
 /// @brief modify some instance of a type
 class ModifyStatement final : public Statement {
+    Instance& instance;
+    ExprPtr expr;
+
 public:
-    ModifyStatement() {}
+    ModifyStatement(Instance &instance, ExprPtr&& expr) :
+        instance(instance), expr(std::move(expr)) {}
+
+    DECL_STATEMENT_FUNCS
+};
+
+class PrintStatement final : public Statement {
+    OptionalExprPtr expr;
+
+public:
+    PrintStatement() {}
+    PrintStatement(ExprPtr &&expr) :
+        expr(std::move(expr)) {}
 
     DECL_STATEMENT_FUNCS
 };
