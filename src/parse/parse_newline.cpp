@@ -1,6 +1,8 @@
-#include "parse_newline.h"
+#include "parse/parse_newline.h"
 
 #include "test_token.h"
+
+namespace parse {
 
 void parse_zero_plus_newlines(CharStream &cstream) {
     if (match_token(cstream, TokenType::TOK_EOF)) return;
@@ -17,3 +19,4 @@ bool parse_one_plus_newlines(CharStream &cstream) {
     return true;
 }
 
+}

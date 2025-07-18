@@ -6,4 +6,8 @@
 #include "ast/statement.h"
 #include "test_token.h"
 
+namespace parse {
+
 ast::OptionalStatementPtr parse_statement(CharStream& cstream, ast::Scope &scope);
+
+}

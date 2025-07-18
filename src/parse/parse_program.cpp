@@ -1,6 +1,8 @@
-#include "parse_program.h"
+#include "parse/parse_program.h"
 
-#include "parse_statement.h"
+#include "parse/parse_statement.h"
+
+namespace parse {
 
 ast::Program parse_program(CharStream &cstream) {
     ast::Scope global_scope;
@@ -18,4 +20,6 @@ ast::Program parse_program(CharStream &cstream) {
         std::move(global_scope),
         std::move(statements)
     );
+}
+
 }

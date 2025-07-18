@@ -1,4 +1,4 @@
-#include "parse_expr.h"
+#include "parse/parse_expr.h"
 
 #include <cstdlib>
 #include <initializer_list>
@@ -8,6 +8,8 @@
 #include "token.h"
 
 #define N_PRECEDENCE_LEVELS (3)
+
+namespace parse {
 
 /// @brief Grouped by precedence, later => higher precedence
 static std::initializer_list<Operator> binary_ops[N_PRECEDENCE_LEVELS] = {
@@ -158,4 +160,6 @@ static ast::OptionalExprPtr parse_literal_expr(CharStream& cstream, ast::Scope& 
         nullptr,
         0 // make use of provided feature to autodetect base
     ));
+}
+
 }

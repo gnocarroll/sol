@@ -1,6 +1,8 @@
-#include "parse_statement.h"
+#include "parse/parse_statement.h"
 
-#include "parse_newline.h"
+#include "parse/parse_newline.h"
+
+namespace parse {
 
 static ast::OptionalStatementPtr _parse_statement(CharStream &cstream, ast::Scope &scope);
 
@@ -67,4 +69,6 @@ static ast::OptionalStatementPtr _parse_statement(CharStream &cstream, ast::Scop
     return std::make_unique<ast::CreateStatement>(
         *scope.get(name)
     );
+}
+
 }
