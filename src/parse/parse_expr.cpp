@@ -65,7 +65,10 @@ static ast::OptionalExprPtr _parse_binary_expr(
         ast::OptionalExprPtr rhs = parse_sub_expr();
 
         if (!rhs) {
-            rhs = std::make_unique<ast::ErrExpr>();
+            rhs = make_unique_w_pos<ast::ErrExpr>(
+                cstream.get_file_pos(),
+                "found no rhs for binary expr"
+            );
         }
 
         lhs = std::make_unique<ast::BinaryExpr>(
@@ -104,7 +107,10 @@ static ast::OptionalExprPtr parse_unary_expr(CharStream& cstream, ast::Scope& sc
 
     if (op_vector.size() == 0 && !ret) return {};
     if (!ret) {
-        ret = std::make_unique<ast::ErrExpr>();
+        ret = make_unique_w_pos<ast::ErrExpr>(
+            cstream.get_file_pos(),
+            "found operators but no operand for unary expr"
+        );
     }
 
     for (long long op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
@@ -138,7 +144,12 @@ static ast::OptionalExprPtr parse_primary_expr(CharStream& cstream, ast::Scope& 
 
         auto instance = scope.get(name);
 
-        if (!instance) return std::make_unique<ast::ErrExpr>();
+        if (!instance) {
+            return make_unique_w_pos<ast::ErrExpr>(
+                cstream.get_file_pos(),
+                std::string("unrecognized variable name: ") + name
+            );
+        }
 
         return std::make_unique<ast::InstanceExpr>(*instance);
     }

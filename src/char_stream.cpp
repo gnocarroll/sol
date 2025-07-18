@@ -69,12 +69,19 @@ std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t fi
     size_t line_start_idx = line_starts[req_line_no];
     size_t line_end_idx =
         req_line_no + 1 < line_starts.size() ?
-            line_starts[req_line_no + 1] : line_starts.size();
+            line_starts[req_line_no + 1] : buffer.size();
     
+    std::string line(
+        &buffer[line_start_idx],
+        line_end_idx - line_start_idx
+    );
+
+    if (line_end_idx == buffer.size()) line += "\n";
+
     return StringLinePair(
         req_line_no,
-        0,
-        std::string(&buffer[line_start_idx], line_end_idx - line_start_idx)
+        (size_t) 0,
+        std::move(line)
     );
 }
 

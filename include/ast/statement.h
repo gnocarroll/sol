@@ -6,18 +6,17 @@
 #include <vector>
 
 #include "execute.h"
+#include "ast/ast_object.h"
 #include "ast/expr.h"
 #include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
+#include "mixins.h"
 
 namespace ast {
 
-class Statement {
-    FilePos file_pos;
-
+class Statement : public ASTObject {
 public:
-
     virtual ~Statement() {}
 
     virtual RetCode execute() = 0;
@@ -36,6 +35,10 @@ public:
 
     void push(std::unique_ptr<Statement> &&new_statement) {
         statements.emplace_back(std::move(new_statement));
+
+        if (statements.back()->has_err()) {
+            set_err();
+        }
     }
 
     DECL_STATEMENT_FUNCS
@@ -77,9 +80,13 @@ public:
     DECL_STATEMENT_FUNCS
 };
 
-class ErrStatement final : public Statement {
+class ErrStatement final : public Statement, public HasErrMsg {
 public:
-    ErrStatement() {}
+    ErrStatement(std::string&& err_msg, CharStream &cstream, size_t back = 0) :
+        HasErrMsg(std::move(err_msg), cstream, back) {
+
+        set_err();
+    }
 
     DECL_STATEMENT_FUNCS
 };

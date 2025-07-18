@@ -12,7 +12,10 @@ ast::OptionalStatementPtr parse_statement(CharStream& cstream, ast::Scope &scope
     if (!ret) return {};
 
     if (!parse_one_plus_newlines(cstream)) {
-        return std::make_unique<ast::ErrStatement>();
+        return make_unique_w_pos<ast::ErrStatement>(
+            cstream.get_file_pos(),
+            "expected at least one newline immediately following statement"
+        );
     }
 
     return ret;
@@ -34,11 +37,19 @@ static ast::OptionalStatementPtr _parse_statement(CharStream &cstream, ast::Scop
     std::string name = cstream.last_n_as_str(*n_chars)->get_str();
 
     if (match_token(cstream, TokenType::TOK_COLON_EQUAL)) {
-        if (scope.get(name)) return std::make_unique<ast::ErrStatement>();
+        if (scope.get(name)) {
+            return make_unique_w_pos<ast::ErrStatement>(
+                cstream.get_file_pos(),
+                std::string("variable already exists: ") + name
+            );
+        }
 
         auto expr = parse_expr(cstream, scope);
 
-        if (!expr) expr = std::make_unique<ast::ErrExpr>();
+        if (!expr) expr = make_unique_w_pos<ast::ErrExpr>(
+                cstream.get_file_pos(),
+                "expected expr to initialize variable"
+            );
 
         scope.push(ast::Instance(std::string(name)));
 
@@ -50,11 +61,17 @@ static ast::OptionalStatementPtr _parse_statement(CharStream &cstream, ast::Scop
     else if (match_token(cstream, TokenType::TOK_EQUAL)) {
         auto instance = scope.get(name);
 
-        if (!instance) return std::make_unique<ast::ErrStatement>();
+        if (!instance) return make_unique_w_pos<ast::ErrStatement>(
+                cstream.get_file_pos(),
+                std::string("variable name not recognized: ") + name
+            );
 
         auto expr = parse_expr(cstream, scope);
 
-        if (!expr) expr = std::make_unique<ast::ErrExpr>();
+        if (!expr) expr = make_unique_w_pos<ast::ErrExpr>(
+                cstream.get_file_pos(),
+                std::string("expected expression for use in modifying variable ") + name
+            );
 
         return std::make_unique<ast::ModifyStatement>(
             *instance,

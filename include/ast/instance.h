@@ -3,13 +3,13 @@
 #include <optional>
 #include <string>
 
+#include "ast/ast_object.h"
+
 namespace ast {
 
-class Instance {
+class Instance : public ASTObject {
 public:
     const std::string name;
-
-    bool err = false;
     std::optional<long> value;
 
     Instance(std::string&& name) : name(std::move(name)) {}

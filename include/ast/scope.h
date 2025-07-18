@@ -5,11 +5,12 @@
 #include <utility>
 #include <vector>
 
+#include "ast/ast_object.h"
 #include "ast/instance.h"
 
 namespace ast {
 
-class Scope {
+class Scope : public ASTObject {
     std::unordered_map<std::string,Instance> instances;
 
 public:

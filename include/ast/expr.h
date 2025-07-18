@@ -7,6 +7,7 @@
 #include <ostream>
 #include <string>
 
+#include "ast/ast_object.h"
 #include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
@@ -14,10 +15,9 @@
 
 namespace ast {
 
-class Expr {
-    FilePos file_pos;
-
+class Expr : public ASTObject {
 public:
+
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
@@ -37,7 +37,12 @@ public:
     const ExprPtr rhs;
 
     BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
-        lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {};
+        lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {
+        
+        if (this->lhs->has_err() || this->rhs->has_err()) {
+            set_err();
+        }
+    };
 
     DECL_EXPR_FUNCS
 };
@@ -48,7 +53,11 @@ public:
     const Operator op;
     const ExprPtr sub_expr;
 
-    UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {}
+    UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {
+        if (this->sub_expr->has_err()) {
+            set_err();
+        }
+    }
 
     DECL_EXPR_FUNCS
 };
@@ -81,7 +90,13 @@ public:
     DECL_EXPR_FUNCS
 };
 
-class ErrExpr final : public Expr {
+class ErrExpr final : public Expr, public HasErrMsg {
+public:
+    ErrExpr(std::string &&err_msg, CharStream &cstream, size_t back = 0) :
+        HasErrMsg(std::move(err_msg), cstream, back) {
+        set_err();
+    }
+
     void print(std::ostream &ostream = std::cout) {
         ostream << "ERR";
     }
