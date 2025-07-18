@@ -32,25 +32,34 @@ std::optional<char> CharStream::peekc() {
     return buffer[buffer_idx];
 }
 
-std::optional<std::string> CharStream::get_line(size_t line_no, size_t first_idx) {
-    if (line_no < first_idx) return {};
+std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t first_idx) {
+    if (req_line_no < first_idx) return {};
 
-    line_no -= first_idx;
+    req_line_no -= first_idx;
 
-    if (line_no >= line_starts.size()) return {};
+    if (req_line_no >= line_starts.size()) return {};
 
-    size_t line_start_idx = line_starts[line_no];
+    size_t line_start_idx = line_starts[req_line_no];
     size_t line_end_idx =
-        line_no + 1 < line_starts.size() ?
-            line_starts[line_no + 1] : line_starts.size();
+        req_line_no + 1 < line_starts.size() ?
+            line_starts[req_line_no + 1] : line_starts.size();
     
-    return std::string(&buffer[line_start_idx], line_end_idx - line_start_idx);
+    return StringLinePair(
+        req_line_no,
+        std::string(&buffer[line_start_idx], line_end_idx - line_start_idx)
+    );
 }
 
-std::optional<std::string> CharStream::last_n_as_str(size_t n_chars) {
+std::optional<StringLinePair> CharStream::last_n_as_str(size_t n_chars) {
     if (buffer_idx < n_chars) return {};
 
-    return std::string(&buffer[buffer_idx - n_chars], n_chars);
+    size_t ret_line_no = line_no;
+
+    for (size_t pos = buffer_idx - n_chars; pos < buffer_idx; pos++) {
+        if (buffer[pos] == '\n') ret_line_no--;
+    }
+
+    return StringLinePair(ret_line_no, std::string(&buffer[buffer_idx - n_chars], n_chars));
 }
 
 

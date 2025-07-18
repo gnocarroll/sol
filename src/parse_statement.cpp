@@ -29,7 +29,7 @@ static OptionalStatementPtr _parse_statement(CharStream &cstream, Scope &scope) 
 
     if (!n_chars) return {};
 
-    std::string name = *(cstream.last_n_as_str(*n_chars));
+    std::string name = cstream.last_n_as_str(*n_chars)->get_str();
 
     if (match_token(cstream, TokenType::TOK_COLON_EQUAL)) {
         if (scope.get(name)) return std::make_unique<ErrStatement>();

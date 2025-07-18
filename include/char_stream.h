@@ -8,6 +8,8 @@
 #include <string_view>
 #include <vector>
 
+#include "string_line_pair.h"
+
 /*
  * Note: CharIOStack will "take ownership" of the file pointer handed to it.
  * The only thing that really means/the only consequence of that is that
@@ -74,8 +76,8 @@ public:
     std::optional<char> getc();
     std::optional<char> peekc();
 
-    std::optional<std::string> get_line(size_t line_no, size_t first_idx = 1);
-    std::optional<std::string> last_n_as_str(size_t n_chars);
+    std::optional<StringLinePair> get_line(size_t line_no, size_t first_idx = 1);
+    std::optional<StringLinePair> last_n_as_str(size_t n_chars);
 
     Checkpoint checkpoint();
     ScopedCheckpoint scoped_checkpoint();

@@ -132,7 +132,7 @@ static OptionalExprPtr parse_primary_expr(CharStream& cstream, Scope& scope) {
     // word
 
     if (auto n_chars = match_token(cstream, TokenType::TOK_WORD)) {
-        std::string name = *cstream.last_n_as_str(*n_chars);
+        std::string name = cstream.last_n_as_str(*n_chars)->get_str();
 
         auto instance = scope.get(name);
 
@@ -151,10 +151,10 @@ static OptionalExprPtr parse_literal_expr(CharStream& cstream, Scope& scope) {
 
     if (!n_chars) return {};
 
-    auto str = cstream.last_n_as_str(*n_chars);
+    auto str = cstream.last_n_as_str(*n_chars)->get_str();
 
     return std::make_unique<IntegerLiteralExpr>(std::strtoull(
-        str->data(),
+        str.data(),
         nullptr,
         0 // make use of provided feature to autodetect base
     ));
