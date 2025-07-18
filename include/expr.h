@@ -7,11 +7,14 @@
 #include <ostream>
 #include <string>
 
+#include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
 #include "operator.h"
 
 class Expr {
+    FilePos file_pos;
+
 public:
     virtual ~Expr() {};
 

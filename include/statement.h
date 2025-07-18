@@ -7,10 +7,13 @@
 
 #include "execute.h"
 #include "expr.h"
+#include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
 
 class Statement {
+    FilePos file_pos;
+
 public:
 
     virtual ~Statement() {}

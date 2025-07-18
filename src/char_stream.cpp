@@ -30,6 +30,19 @@ std::optional<char> CharStream::peekc() {
     return buffer[buffer_idx];
 }
 
+size_t CharStream::line_start_pos(size_t req_line_no) const {
+    if (req_line_no < 1) req_line_no = 1;
+
+    return line_starts[req_line_no - 1];
+}
+
+FilePos CharStream::get_file_pos(size_t go_back) const {
+    if (go_back == 0) return FilePos(line_no, line_start_pos(line_no));
+    if (go_back > buffer_idx) go_back = buffer_idx;
+
+    return get_file_pos_from_buffer_idx(buffer_idx - go_back).line_no;
+}
+
 FilePos CharStream::get_file_pos_from_buffer_idx(size_t idx) const {
     auto iter = std::upper_bound(
         line_starts.begin(),

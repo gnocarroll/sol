@@ -76,6 +76,9 @@ public:
     std::optional<char> getc();
     std::optional<char> peekc();
 
+    size_t line_start_pos(size_t req_line_no) const;
+    FilePos get_file_pos(size_t go_back = 0) const;
+
     std::optional<StringLinePair> get_line(size_t line_no, size_t first_idx = 1) const;
     std::optional<StringLinePair> last_n_as_str(size_t n_chars) const;
 
