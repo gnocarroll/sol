@@ -17,9 +17,11 @@
 class CharStream {
 public:
     class Checkpoint {
-        size_t idx;
+        size_t buffer_idx;
+        size_t line_no;
 
-        Checkpoint(size_t idx) : idx(idx) {}
+        Checkpoint(size_t buffer_idx, size_t line_no) :
+            buffer_idx(buffer_idx), line_no(line_no) {}
 
         friend class CharStream;
     };
@@ -27,16 +29,18 @@ public:
     class ScopedCheckpoint {
         bool is_disabled = false;
         CharStream &cstream;
-        size_t idx;
+        size_t buffer_idx;
+        size_t line_no;
 
-        ScopedCheckpoint(CharStream& cstream, size_t idx) :
-            cstream(cstream), idx(idx) {}
+        ScopedCheckpoint(CharStream& cstream, size_t idx, size_t line_no) :
+            cstream(cstream), buffer_idx(idx), line_no(line_no) {}
 
     public:
         ~ScopedCheckpoint() {
             if (is_disabled) return;
 
-            cstream.buffer_idx = idx;
+            cstream.buffer_idx = buffer_idx;
+            cstream.line_no = line_no;
         }
 
         void disable() {
@@ -49,6 +53,10 @@ public:
 private:
     size_t buffer_idx = 0;
     std::string buffer;
+
+    size_t line_no = 1;
+
+    std::vector<size_t> line_starts{ 0 };
 
     std::istream& in_stream;
 
@@ -66,6 +74,7 @@ public:
     std::optional<char> getc();
     std::optional<char> peekc();
 
+    std::optional<std::string> get_line(size_t line_no, size_t first_idx = 1);
     std::optional<std::string> last_n_as_str(size_t n_chars);
 
     Checkpoint checkpoint();

@@ -7,7 +7,11 @@
 std::optional<char> CharStream::getc() {
     auto ret = peekc();
 
-    if (ret) buffer_idx++;
+    if (ret) {
+        buffer_idx++;
+
+        if (*ret == '\n') line_no++;
+    }
 
     return ret;
 }
@@ -21,9 +25,26 @@ std::optional<char> CharStream::peekc() {
         }
 
         buffer.push_back(c);
+
+        if (c == '\n') line_starts.push_back(buffer.size());
     }
 
     return buffer[buffer_idx];
+}
+
+std::optional<std::string> CharStream::get_line(size_t line_no, size_t first_idx) {
+    if (line_no < first_idx) return {};
+
+    line_no -= first_idx;
+
+    if (line_no >= line_starts.size()) return {};
+
+    size_t line_start_idx = line_starts[line_no];
+    size_t line_end_idx =
+        line_no + 1 < line_starts.size() ?
+            line_starts[line_no + 1] : line_starts.size();
+    
+    return std::string(&buffer[line_start_idx], line_end_idx - line_start_idx);
 }
 
 std::optional<std::string> CharStream::last_n_as_str(size_t n_chars) {
@@ -34,17 +55,18 @@ std::optional<std::string> CharStream::last_n_as_str(size_t n_chars) {
 
 
 CharStream::Checkpoint CharStream::checkpoint() {
-    return Checkpoint(buffer_idx);
+    return Checkpoint(buffer_idx, line_no);
 }
 
 void CharStream::goto_checkpoint(Checkpoint checkpoint) {
-    if (checkpoint.idx > buffer.size()) {
-        checkpoint.idx = buffer.size();
+    if (checkpoint.buffer_idx > buffer.size()) {
+        checkpoint.buffer_idx = buffer.size();
     }
 
-    buffer_idx = checkpoint.idx;
+    buffer_idx = checkpoint.buffer_idx;
+    line_no = checkpoint.line_no;
 }
 
 CharStream::ScopedCheckpoint CharStream::scoped_checkpoint() {
-    return ScopedCheckpoint(*this, buffer_idx);
+    return ScopedCheckpoint(*this, buffer_idx, line_no);
 }
