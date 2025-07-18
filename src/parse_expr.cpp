@@ -21,20 +21,27 @@ static Operator unary_ops[] = {
     Operator::OP_SUB
 };
 
-static OptionalExprPtr parse_binary_expr(CharStream&);
-static OptionalExprPtr parse_unary_expr(CharStream&);
-static OptionalExprPtr parse_primary_expr(CharStream&);
-static OptionalExprPtr parse_literal_expr(CharStream&);
+#define DECL_EXPR_PARSER(name) \
+    static OptionalExprPtr name (CharStream&, Scope&);
 
-OptionalExprPtr parse_expr(CharStream& cstream) {
-    return parse_binary_expr(cstream);
+DECL_EXPR_PARSER(parse_binary_expr)
+DECL_EXPR_PARSER(parse_unary_expr)
+DECL_EXPR_PARSER(parse_primary_expr)
+DECL_EXPR_PARSER(parse_literal_expr)
+
+OptionalExprPtr parse_expr(CharStream& cstream, Scope& scope) {
+    return parse_binary_expr(cstream, scope);
 }
 
-static OptionalExprPtr _parse_binary_expr(CharStream& cstream, size_t precedence_idx) {
+static OptionalExprPtr _parse_binary_expr(
+    CharStream& cstream,
+    Scope& scope,
+    size_t precedence_idx
+) {
     auto parse_sub_expr = [&] {
-        if (precedence_idx >= N_PRECEDENCE_LEVELS - 1) return parse_unary_expr(cstream);
+        if (precedence_idx >= N_PRECEDENCE_LEVELS - 1) return parse_unary_expr(cstream, scope);
 
-        return _parse_binary_expr(cstream, precedence_idx + 1);
+        return _parse_binary_expr(cstream, scope, precedence_idx + 1);
     };
 
     OptionalExprPtr lhs = parse_sub_expr();
@@ -69,11 +76,11 @@ static OptionalExprPtr _parse_binary_expr(CharStream& cstream, size_t precedence
     return lhs;
 }
 
-static OptionalExprPtr parse_binary_expr(CharStream& cstream) {
-    return _parse_binary_expr(cstream, 0);
+static OptionalExprPtr parse_binary_expr(CharStream& cstream, Scope& scope) {
+    return _parse_binary_expr(cstream, scope, 0);
 }
 
-static OptionalExprPtr parse_unary_expr(CharStream& cstream) {
+static OptionalExprPtr parse_unary_expr(CharStream& cstream, Scope& scope) {
     std::vector<Operator> op_vector;
     
     while (true) {
@@ -91,7 +98,7 @@ static OptionalExprPtr parse_unary_expr(CharStream& cstream) {
         op_vector.push_back(*found_op);
     }
 
-    auto ret = parse_primary_expr(cstream);
+    auto ret = parse_primary_expr(cstream, scope);
 
     if (op_vector.size() == 0 && !ret) return {};
     if (!ret) {
@@ -108,12 +115,12 @@ static OptionalExprPtr parse_unary_expr(CharStream& cstream) {
     return ret;
 }
 
-static OptionalExprPtr parse_primary_expr(CharStream& cstream) {
+static OptionalExprPtr parse_primary_expr(CharStream& cstream, Scope& scope) {
     // ( expr )
 
     if (match_token(cstream, TokenType::TOK_L_PAREN)) {
 
-        auto ret = parse_expr(cstream);
+        auto ret = parse_expr(cstream, scope);
 
         if (!match_token(cstream, TokenType::TOK_R_PAREN)) {
             // TODO: report error, expected R_PAREN
@@ -121,13 +128,25 @@ static OptionalExprPtr parse_primary_expr(CharStream& cstream) {
 
         return ret;
     }
+    
+    // word
+
+    if (auto n_chars = match_token(cstream, TokenType::TOK_WORD)) {
+        std::string name = *cstream.last_n_as_str(*n_chars);
+
+        auto instance = scope.get(name);
+
+        if (!instance) return std::make_unique<ErrExpr>();
+
+        return std::make_unique<InstanceExpr>(*instance);
+    }
 
     // literal
 
-    return parse_literal_expr(cstream);
+    return parse_literal_expr(cstream, scope);
 }
 
-static OptionalExprPtr parse_literal_expr(CharStream& cstream) {
+static OptionalExprPtr parse_literal_expr(CharStream& cstream, Scope& scope) {
     auto n_chars = match_token(cstream, TokenType::TOK_INTEGER);
 
     if (!n_chars) return {};

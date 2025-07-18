@@ -7,9 +7,9 @@
 #include <ostream>
 #include <string>
 
+#include "instance.h"
 #include "macros.h"
 #include "operator.h"
-
 
 class Expr {
 public:
@@ -65,6 +65,15 @@ public:
     std::optional<long> eval() {
         return value;
     }
+};
+
+class InstanceExpr final : public Expr {
+    Instance &instance;
+
+public:
+    InstanceExpr(Instance &instance) : instance(instance) {}
+
+    DECL_EXPR_FUNCS
 };
 
 class ErrExpr final : public Expr {

@@ -43,3 +43,7 @@ void UnaryExpr::print(std::ostream &ostream) {
 
     ostream << ')';
 }
+
+void InstanceExpr::print(std::ostream &ostream) {
+    ostream << instance.name;
+}

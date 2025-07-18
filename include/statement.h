@@ -72,7 +72,7 @@ public:
 
 class ErrStatement final : public Statement {
 public:
-    ErrStatement();
+    ErrStatement() {}
 
     void execute() {}
 };
