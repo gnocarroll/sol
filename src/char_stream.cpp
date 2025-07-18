@@ -1,8 +1,6 @@
 #include "char_stream.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <algorithm>
 
 std::optional<char> CharStream::getc() {
     auto ret = peekc();
@@ -32,7 +30,23 @@ std::optional<char> CharStream::peekc() {
     return buffer[buffer_idx];
 }
 
-std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t first_idx) {
+FilePos CharStream::get_file_pos_from_buffer_idx(size_t idx) const {
+    auto iter = std::upper_bound(
+        line_starts.begin(),
+        line_starts.end(),
+        idx
+    );
+
+    iter--;
+
+    size_t line_no = iter - line_starts.begin() + 1;
+    size_t offset = idx - *iter;
+
+    return FilePos(line_no, offset);
+}
+
+
+std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t first_idx) const {
     if (req_line_no < first_idx) return {};
 
     req_line_no -= first_idx;
@@ -46,20 +60,21 @@ std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t fi
     
     return StringLinePair(
         req_line_no,
+        0,
         std::string(&buffer[line_start_idx], line_end_idx - line_start_idx)
     );
 }
 
-std::optional<StringLinePair> CharStream::last_n_as_str(size_t n_chars) {
+std::optional<StringLinePair> CharStream::last_n_as_str(size_t n_chars) const {
     if (buffer_idx < n_chars) return {};
 
-    size_t ret_line_no = line_no;
+    FilePos pos = get_file_pos_from_buffer_idx(buffer_idx - n_chars);
 
-    for (size_t pos = buffer_idx - n_chars; pos < buffer_idx; pos++) {
-        if (buffer[pos] == '\n') ret_line_no--;
-    }
-
-    return StringLinePair(ret_line_no, std::string(&buffer[buffer_idx - n_chars], n_chars));
+    return StringLinePair(
+        pos.line_no,
+        pos.offset,
+        std::string(&buffer[buffer_idx - n_chars], n_chars)
+    );
 }
 
 

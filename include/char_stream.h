@@ -76,8 +76,10 @@ public:
     std::optional<char> getc();
     std::optional<char> peekc();
 
-    std::optional<StringLinePair> get_line(size_t line_no, size_t first_idx = 1);
-    std::optional<StringLinePair> last_n_as_str(size_t n_chars);
+    std::optional<StringLinePair> get_line(size_t line_no, size_t first_idx = 1) const;
+    std::optional<StringLinePair> last_n_as_str(size_t n_chars) const;
+
+    FilePos get_file_pos_from_buffer_idx(size_t idx) const;
 
     Checkpoint checkpoint();
     ScopedCheckpoint scoped_checkpoint();
