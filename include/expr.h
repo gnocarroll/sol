@@ -16,6 +16,7 @@ public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
+    virtual std::optional<long> eval() = 0;
 };
 
 DEF_PTR_TYPES(Expr)
@@ -30,6 +31,7 @@ public:
         lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {};
 
     void print(std::ostream &ostream = std::cout);
+    std::optional<long> eval();
 };
 
 class UnaryExpr final : public Expr {
@@ -41,6 +43,7 @@ public:
     UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {}
 
     void print(std::ostream &ostream = std::cout);
+    std::optional<long> eval();
 };
 
 class LiteralExpr : public Expr {
@@ -48,23 +51,26 @@ public:
     virtual ~LiteralExpr() {};
 };
 
-template <typename T>
-class GenericLiteralExpr final : public LiteralExpr {
+class IntegerLiteralExpr final : public LiteralExpr {
 public:
-    const T value;
+    const long value;
 
-    GenericLiteralExpr(T&& value) : value(std::move(value)) {}
+    IntegerLiteralExpr(long value) : value(value) {}
 
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
+    std::optional<long> eval() {
+        return value;
+    }
 };
-
-using IntegerLiteralExpr = GenericLiteralExpr<size_t>;
-using StringLiteralExpr = GenericLiteralExpr<std::string>;
 
 class ErrExpr final : public Expr {
     void print(std::ostream &ostream = std::cout) {
         ostream << "ERR";
+    }
+    std::optional<long> eval() {
+        // TODO: stop on err
+        return {};
     }
 };

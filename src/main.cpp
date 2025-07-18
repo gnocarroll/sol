@@ -11,13 +11,11 @@ int main(void) {
         CharStream cstream(isstream);
 
         auto expr = parse_expr(cstream);
+        auto value = (*expr)->eval();
 
-        if (!expr) {
-            std::cout << "ERR\n";
-            continue;
-        }
+        if (value) std::cout << *value;
+        else std::cout << "ERR";
 
-        (*expr)->print();
         std::cout << '\n';
     }
 

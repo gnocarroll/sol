@@ -62,6 +62,9 @@ for test_idx, (input, expected_output) in enumerate(tests, start=1):
         ret_code = e.returncode
         actual_output=e.stdout
 
+    actual_output = actual_output.strip()
+    expected_output = expected_output.strip()
+
     output_correct = (actual_output == expected_output)
 
     test_passed = (output_correct and not exe_err)

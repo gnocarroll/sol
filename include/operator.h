@@ -29,5 +29,9 @@ public:
         return this->value == value;
     }
 
+    OperatorEnum operator()() const {
+        return value;
+    }
+
     std::optional<TokenType> get_token_type() const;
 };

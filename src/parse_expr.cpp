@@ -55,8 +55,9 @@ static OptionalExprPtr _parse_binary_expr(CharStream& cstream, size_t precedence
 
         OptionalExprPtr rhs = parse_sub_expr();
 
-        // TODO: print something on error, better error handling, idk
-        if (!rhs) return {};
+        if (!rhs) {
+            rhs = std::make_unique<ErrExpr>();
+        }
 
         lhs = std::make_unique<BinaryExpr>(
             std::move(*lhs),
