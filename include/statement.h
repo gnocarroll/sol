@@ -5,19 +5,21 @@
 #include <optional>
 #include <vector>
 
+#include "execute.h"
 #include "expr.h"
 #include "instance.h"
 #include "macros.h"
 
 class Statement {
 public:
+
     virtual ~Statement() {}
 
-    virtual void execute() = 0;
+    virtual RetCode execute() = 0;
 };
 
 #define DECL_STATEMENT_FUNCS \
-    void execute();
+    RetCode execute();
 
 DEF_PTR_TYPES(Statement)
 
@@ -74,7 +76,7 @@ class ErrStatement final : public Statement {
 public:
     ErrStatement() {}
 
-    void execute() {}
+    DECL_STATEMENT_FUNCS
 };
 
 #undef DECL_STATEMENT_FUNCS

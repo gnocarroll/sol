@@ -1,49 +1,63 @@
 #include "statement.h"
 
-void CompoundStatement::execute() {
+RetCode CompoundStatement::execute() {
     for (auto& statement : statements) {
-        statement->execute();
+        auto stmt_ret = statement->execute();
+
+        if (stmt_ret.is_err()) return stmt_ret;
     }
+
+    return RetCode::ok();
 }
 
-void CreateStatement::execute() {
-    if (instance.err || !expr) return;
+RetCode CreateStatement::execute() {
+    if (instance.err) return RetCode("error in instance");
+    if (!expr) return RetCode::ok();
 
     auto val = (*expr)->eval();
 
     if (!val) {
         instance.err = true;
-        return;
+        return RetCode("expression evaluation failed");
     }
 
     instance.value = (*val);
+
+    return RetCode::ok();
 }
 
-void ModifyStatement::execute() {
-    if (instance.err) return;
+RetCode ModifyStatement::execute() {
+    if (instance.err) return RetCode("error in instance");
 
     auto val = expr->eval();
 
     if (!val) {
         instance.err = true;
-        return;
+        return RetCode("expr evaluation failed");
     }
 
     instance.value = *val;
+
+    return RetCode::ok();
 }
 
-void PrintStatement::execute() {
+RetCode PrintStatement::execute() {
     if (!expr) {
         std::cout << '\n';
-        return;
+        return RetCode::ok();
     }
 
     auto val = (*expr)->eval();
 
     if (!val) {
-        std::cout << "ERR\n";
-        return;
+        return RetCode("expression evaluation failed");
     }
 
     std::cout << *val << '\n';
+
+    return RetCode::ok();
+}
+
+RetCode ErrStatement::execute() {
+    return RetCode("cannot execute malformed error statement");
 }

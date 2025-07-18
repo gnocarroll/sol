@@ -1,5 +1,6 @@
 #pragma once
 
+#include "execute.h"
 #include "scope.h"
 #include "statement.h"
 
@@ -11,7 +12,7 @@ public:
     Program(Scope&& global_scope, CompoundStatement&& statements) :
         global_scope(global_scope), statements(std::move(statements)) {}
 
-    void execute() {
-        statements.execute();
+    RetCode execute() {
+        return statements.execute();
     }
 };

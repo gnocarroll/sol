@@ -8,7 +8,11 @@ int main(void) {
 
     auto program = parse_program(cstream);
 
-    program.execute();
+    auto ret_code = program.execute();
+
+    if (ret_code.is_err()) {
+        std::cout << *ret_code.get_err_msg() << '\n';
+    }
 
     return 0;
 }
