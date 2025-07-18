@@ -1,8 +1,10 @@
 #pragma once
 
 #include "execute.h"
-#include "scope.h"
-#include "statement.h"
+#include "ast/scope.h"
+#include "ast/statement.h"
+
+namespace ast {
 
 class Program {
     Scope global_scope;
@@ -16,3 +18,5 @@ public:
         return statements.execute();
     }
 };
+
+}

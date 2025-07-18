@@ -12,6 +12,8 @@
 #include "macros.h"
 #include "operator.h"
 
+namespace ast {
+
 class Expr {
     FilePos file_pos;
 
@@ -90,3 +92,5 @@ class ErrExpr final : public Expr {
 };
 
 #undef DECL_EXPR_FUNCS
+
+}

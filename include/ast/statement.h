@@ -6,10 +6,12 @@
 #include <vector>
 
 #include "execute.h"
-#include "expr.h"
+#include "ast/expr.h"
 #include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
+
+namespace ast {
 
 class Statement {
     FilePos file_pos;
@@ -83,3 +85,5 @@ public:
 };
 
 #undef DECL_STATEMENT_FUNCS
+
+}

@@ -3,6 +3,8 @@
 #include <optional>
 #include <string>
 
+namespace ast {
+
 class Instance {
 public:
     const std::string name;
@@ -12,3 +14,5 @@ public:
 
     Instance(std::string&& name) : name(std::move(name)) {}
 };
+
+}

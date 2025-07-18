@@ -5,7 +5,9 @@
 #include <utility>
 #include <vector>
 
-#include "instance.h"
+#include "ast/instance.h"
+
+namespace ast {
 
 class Scope {
     std::unordered_map<std::string,Instance> instances;
@@ -28,3 +30,5 @@ public:
         return instances.at(name);
     }
 };
+
+}

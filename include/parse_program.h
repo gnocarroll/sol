@@ -1,6 +1,6 @@
 #pragma once
 
 #include "char_stream.h"
-#include "program.h"
+#include "ast/program.h"
 
-Program parse_program(CharStream &cstream);
+ast::Program parse_program(CharStream &cstream);

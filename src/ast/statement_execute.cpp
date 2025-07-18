@@ -1,4 +1,6 @@
-#include "statement.h"
+#include "ast/statement.h"
+
+namespace ast {
 
 RetCode CompoundStatement::execute() {
     for (auto& statement : statements) {
@@ -60,4 +62,6 @@ RetCode PrintStatement::execute() {
 
 RetCode ErrStatement::execute() {
     return RetCode("cannot execute malformed error statement");
+}
+
 }

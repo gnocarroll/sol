@@ -1,4 +1,6 @@
-#include "expr.h"
+#include "ast/expr.h"
+
+namespace ast {
 
 std::optional<long> BinaryExpr::eval() {
     auto lhs_val = lhs->eval();
@@ -47,4 +49,6 @@ std::optional<long> InstanceExpr::eval() {
     if (instance.err) return {};
 
     return instance.value;
+}
+
 }

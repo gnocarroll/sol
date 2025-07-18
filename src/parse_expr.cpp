@@ -22,20 +22,20 @@ static Operator unary_ops[] = {
 };
 
 #define DECL_EXPR_PARSER(name) \
-    static OptionalExprPtr name (CharStream&, Scope&);
+    static ast::OptionalExprPtr name (CharStream&, ast::Scope&);
 
 DECL_EXPR_PARSER(parse_binary_expr)
 DECL_EXPR_PARSER(parse_unary_expr)
 DECL_EXPR_PARSER(parse_primary_expr)
 DECL_EXPR_PARSER(parse_literal_expr)
 
-OptionalExprPtr parse_expr(CharStream& cstream, Scope& scope) {
+ast::OptionalExprPtr parse_expr(CharStream& cstream, ast::Scope& scope) {
     return parse_binary_expr(cstream, scope);
 }
 
-static OptionalExprPtr _parse_binary_expr(
+static ast::OptionalExprPtr _parse_binary_expr(
     CharStream& cstream,
-    Scope& scope,
+    ast::Scope& scope,
     size_t precedence_idx
 ) {
     auto parse_sub_expr = [&] {
@@ -44,7 +44,7 @@ static OptionalExprPtr _parse_binary_expr(
         return _parse_binary_expr(cstream, scope, precedence_idx + 1);
     };
 
-    OptionalExprPtr lhs = parse_sub_expr();
+    ast::OptionalExprPtr lhs = parse_sub_expr();
 
     if (!lhs) return {};
 
@@ -60,13 +60,13 @@ static OptionalExprPtr _parse_binary_expr(
 
         if (!found_op) break;
 
-        OptionalExprPtr rhs = parse_sub_expr();
+        ast::OptionalExprPtr rhs = parse_sub_expr();
 
         if (!rhs) {
-            rhs = std::make_unique<ErrExpr>();
+            rhs = std::make_unique<ast::ErrExpr>();
         }
 
-        lhs = std::make_unique<BinaryExpr>(
+        lhs = std::make_unique<ast::BinaryExpr>(
             std::move(*lhs),
             *found_op,
             std::move(*rhs)
@@ -76,11 +76,11 @@ static OptionalExprPtr _parse_binary_expr(
     return lhs;
 }
 
-static OptionalExprPtr parse_binary_expr(CharStream& cstream, Scope& scope) {
+static ast::OptionalExprPtr parse_binary_expr(CharStream& cstream, ast::Scope& scope) {
     return _parse_binary_expr(cstream, scope, 0);
 }
 
-static OptionalExprPtr parse_unary_expr(CharStream& cstream, Scope& scope) {
+static ast::OptionalExprPtr parse_unary_expr(CharStream& cstream, ast::Scope& scope) {
     std::vector<Operator> op_vector;
     
     while (true) {
@@ -102,11 +102,11 @@ static OptionalExprPtr parse_unary_expr(CharStream& cstream, Scope& scope) {
 
     if (op_vector.size() == 0 && !ret) return {};
     if (!ret) {
-        ret = std::make_unique<ErrExpr>();
+        ret = std::make_unique<ast::ErrExpr>();
     }
 
     for (long long op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
-        ret = std::make_unique<UnaryExpr>(
+        ret = std::make_unique<ast::UnaryExpr>(
             op_vector[op_idx],
             std::move(*ret)
         );
@@ -115,7 +115,7 @@ static OptionalExprPtr parse_unary_expr(CharStream& cstream, Scope& scope) {
     return ret;
 }
 
-static OptionalExprPtr parse_primary_expr(CharStream& cstream, Scope& scope) {
+static ast::OptionalExprPtr parse_primary_expr(CharStream& cstream, ast::Scope& scope) {
     // ( expr )
 
     if (match_token(cstream, TokenType::TOK_L_PAREN)) {
@@ -136,9 +136,9 @@ static OptionalExprPtr parse_primary_expr(CharStream& cstream, Scope& scope) {
 
         auto instance = scope.get(name);
 
-        if (!instance) return std::make_unique<ErrExpr>();
+        if (!instance) return std::make_unique<ast::ErrExpr>();
 
-        return std::make_unique<InstanceExpr>(*instance);
+        return std::make_unique<ast::InstanceExpr>(*instance);
     }
 
     // literal
@@ -146,14 +146,14 @@ static OptionalExprPtr parse_primary_expr(CharStream& cstream, Scope& scope) {
     return parse_literal_expr(cstream, scope);
 }
 
-static OptionalExprPtr parse_literal_expr(CharStream& cstream, Scope& scope) {
+static ast::OptionalExprPtr parse_literal_expr(CharStream& cstream, ast::Scope& scope) {
     auto n_chars = match_token(cstream, TokenType::TOK_INTEGER);
 
     if (!n_chars) return {};
 
     auto str = cstream.last_n_as_str(*n_chars)->get_str();
 
-    return std::make_unique<IntegerLiteralExpr>(std::strtoull(
+    return std::make_unique<ast::IntegerLiteralExpr>(std::strtoull(
         str.data(),
         nullptr,
         0 // make use of provided feature to autodetect base

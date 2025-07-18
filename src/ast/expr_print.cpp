@@ -1,6 +1,8 @@
-#include "expr.h"
+#include "ast/expr.h"
 
 #include <cmath>
+
+namespace ast {
 
 void BinaryExpr::print(std::ostream &ostream) {
     ostream << '(';
@@ -46,4 +48,6 @@ void UnaryExpr::print(std::ostream &ostream) {
 
 void InstanceExpr::print(std::ostream &ostream) {
     ostream << instance.name;
+}
+
 }

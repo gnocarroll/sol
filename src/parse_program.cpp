@@ -2,9 +2,9 @@
 
 #include "parse_statement.h"
 
-Program parse_program(CharStream &cstream) {
-    Scope global_scope;
-    CompoundStatement statements;
+ast::Program parse_program(CharStream &cstream) {
+    ast::Scope global_scope;
+    ast::CompoundStatement statements;
 
     while (true) {
         auto statement = parse_statement(cstream, global_scope);
@@ -14,7 +14,7 @@ Program parse_program(CharStream &cstream) {
         statements.push(std::move(*statement));
     }
 
-    return Program(
+    return ast::Program(
         std::move(global_scope),
         std::move(statements)
     );
