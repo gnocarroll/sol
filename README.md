@@ -32,3 +32,16 @@ Output should be:
 ```
 
 Currently, this basic functionality seems to be working.
+
+Next will move on to basic script with integer variables and PRINT function.
+
+```
+a := 1 + 1
+b := 3
+
+a = a + b
+
+PRINT a
+```
+
+Should print 5. Once I get going may rework syntax a little
