@@ -2,8 +2,11 @@
 
 #include <cctype>
 
-static std::optional<size_t> match_integer(CharStream &cstream);
-static std::optional<size_t> match_word(CharStream &cstream);
+#define DECL_SPECIAL_MATCHER(name) \
+    static std::optional<size_t> name (CharStream &cstream);
+
+DECL_SPECIAL_MATCHER(match_integer)
+DECL_SPECIAL_MATCHER(match_word)
 
 static void skip_ignored_ws(CharStream &cstream);
 
