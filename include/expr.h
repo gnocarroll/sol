@@ -3,6 +3,7 @@
 #include <expected>
 #include <memory>
 #include <optional>
+#include <ostream>
 #include <string>
 
 #include "macros.h"
@@ -10,12 +11,15 @@
 
 
 class Expr {
-    
+public:
+    virtual ~Expr() {};
+
+    virtual void print(std::ostream&) = 0;
 };
 
 DEF_PTR_TYPES(Expr)
 
-class BinaryExpr : Expr {
+class BinaryExpr final : public Expr {
 public:
     const ExprPtr lhs;
     const Operator op;
@@ -23,35 +27,43 @@ public:
 
     BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
         lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {};
+
+    void print(std::ostream &ostream);
 };
 
-class UnaryExpr : Expr {
+class UnaryExpr final : public Expr {
 public:
 
     const Operator op;
     const ExprPtr sub_expr;
 
     UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {}
+
+    void print(std::ostream &ostream);
 };
 
-class PrimaryExpr : Expr {
+class LiteralExpr : public Expr {
 public:
-    const ExprPtr sub_expr;
-
-    PrimaryExpr(ExprPtr&& sub_expr) : sub_expr(std::move(sub_expr)) {}
-};
-
-class LiteralExpr : Expr {
-
+    virtual ~LiteralExpr() {};
 };
 
 template <typename T>
-class GenericLiteralExpr : LiteralExpr {
+class GenericLiteralExpr final : public LiteralExpr {
 public:
     const T value;
 
     GenericLiteralExpr(T&& value) : value(std::move(value)) {}
+
+    void print(std::ostream &ostream) {
+        ostream << value;
+    }
 };
 
 using IntegerLiteralExpr = GenericLiteralExpr<size_t>;
 using StringLiteralExpr = GenericLiteralExpr<std::string>;
+
+class ErrExpr final : public Expr {
+    void print(std::ostream &ostream) {
+        ostream << "ERR";
+    }
+};

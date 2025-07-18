@@ -2,7 +2,7 @@
 
 static TokenType operator_token_arr[] = {
 
-#define OP(name, ttype) TokenType::##ttype ,
+#define OP(name, ttype) TokenType:: ttype ,
 
 #include "def_operators.txt"
 
