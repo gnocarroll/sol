@@ -12,8 +12,13 @@ int main(void) {
 
         auto expr = parse_expr(cstream);
 
-        if (!expr) std::cout << "ERR";
-        else (*expr)->print(std::cout);
+        if (!expr) {
+            std::cout << "ERR\n";
+            continue;
+        }
+
+        (*expr)->print();
+        std::cout << '\n';
     }
 
     return 0;

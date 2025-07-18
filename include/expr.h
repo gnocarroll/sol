@@ -1,6 +1,7 @@
 #pragma once
 
 #include <expected>
+#include <iostream>
 #include <memory>
 #include <optional>
 #include <ostream>
@@ -14,7 +15,7 @@ class Expr {
 public:
     virtual ~Expr() {};
 
-    virtual void print(std::ostream&) = 0;
+    virtual void print(std::ostream& ostream = std::cout) = 0;
 };
 
 DEF_PTR_TYPES(Expr)
@@ -28,7 +29,7 @@ public:
     BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
         lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {};
 
-    void print(std::ostream &ostream);
+    void print(std::ostream &ostream = std::cout);
 };
 
 class UnaryExpr final : public Expr {
@@ -39,7 +40,7 @@ public:
 
     UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {}
 
-    void print(std::ostream &ostream);
+    void print(std::ostream &ostream = std::cout);
 };
 
 class LiteralExpr : public Expr {
@@ -54,7 +55,7 @@ public:
 
     GenericLiteralExpr(T&& value) : value(std::move(value)) {}
 
-    void print(std::ostream &ostream) {
+    void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
 };
@@ -63,7 +64,7 @@ using IntegerLiteralExpr = GenericLiteralExpr<size_t>;
 using StringLiteralExpr = GenericLiteralExpr<std::string>;
 
 class ErrExpr final : public Expr {
-    void print(std::ostream &ostream) {
+    void print(std::ostream &ostream = std::cout) {
         ostream << "ERR";
     }
 };

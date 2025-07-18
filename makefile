@@ -1,7 +1,7 @@
 include .env
 export
 
-CFLAGS= -std=c++2b -Wall -Werror -I$(INCLUDE_DIR) -I$(RESOURCE_DIR) 
+CFLAGS= -g -std=c++2b -Wall -Werror -I$(INCLUDE_DIR) -I$(RESOURCE_DIR) 
 
 SRC_FILES=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ_FILES=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))

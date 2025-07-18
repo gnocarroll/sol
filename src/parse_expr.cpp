@@ -97,6 +97,8 @@ static OptionalExprPtr parse_unary_expr(CharStream& cstream) {
         ret = std::make_unique<ErrExpr>();
     }
 
+    if (op_vector.size() == 0) return ret;
+
     for (size_t op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
         ret = std::make_unique<UnaryExpr>(
             op_vector[op_idx],
