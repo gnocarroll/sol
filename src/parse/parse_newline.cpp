@@ -1,4 +1,4 @@
-#include "parse/parse_newline.h"
+#include "parse.h"
 
 #include "test_token.h"
 

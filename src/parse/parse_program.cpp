@@ -1,6 +1,4 @@
-#include "parse/parse_program.h"
-
-#include "parse/parse_statement.h"
+#include "parse.h"
 
 namespace parse {
 

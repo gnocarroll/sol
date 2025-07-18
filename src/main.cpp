@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "char_stream.h"
-#include "parse/parse_program.h"
+#include "parse.h"
 
 int main(void) {
     CharStream cstream(std::cin);
