@@ -5,6 +5,7 @@
 #define DECL_SPECIAL_MATCHER(name) \
     static std::optional<size_t> name (CharStream &cstream);
 
+DECL_SPECIAL_MATCHER(match_eof)
 DECL_SPECIAL_MATCHER(match_integer)
 DECL_SPECIAL_MATCHER(match_word)
 
@@ -14,6 +15,8 @@ std::optional<size_t> match_token(CharStream &cstream, TokenType ttype) {
     skip_ignored_ws(cstream);
 
     switch (ttype()) {
+    case TokenType::TOK_EOF:
+        return match_eof(cstream);
     case TokenType::TOK_INTEGER:
         return match_integer(cstream);
     case TokenType::TOK_WORD:
@@ -45,6 +48,14 @@ std::optional<size_t> match_token(CharStream &cstream, TokenType ttype) {
     }
 
     return {};
+}
+
+static std::optional<size_t> match_eof(CharStream &cstream) {
+    // if there is a character then it is not EOF
+    if (cstream.peekc()) return {};
+
+    // EOF token is length 0 token
+    return 0;
 }
 
 static std::optional<size_t> match_integer(CharStream &cstream) {

@@ -19,6 +19,7 @@ TOK(TOK_COLON_EQUAL, ":=")
 
 TOK(TOK_NEWLINE, "\n")
 
+TOK(TOK_EOF, "")
 TOK(TOK_INTEGER, "")
 TOK(TOK_WORD, "")
 
