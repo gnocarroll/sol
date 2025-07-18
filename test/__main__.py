@@ -33,6 +33,10 @@ tests = [
     ("10 / 3", "3"),
     ("20 % 3", "2"),
     ("2 ** 3", "8"),
+    ("5 + 5 ** 2", "30"),
+    ("5 + 5 *   5    **    2", "130"),
+    ("5 / 3 * 10", "10"),
+    ("5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5", "5"),
 ]
 
 
@@ -61,6 +65,9 @@ for test_idx, (input, expected_output) in enumerate(tests, start=1):
         exe_err = True
         ret_code = e.returncode
         actual_output=e.stdout
+
+    actual_output = actual_output.strip()
+    expected_output = expected_output.strip()
 
     output_correct = (actual_output == expected_output)
 

@@ -1,17 +1,37 @@
 #pragma once
 
-typedef enum operator_type {
-    OP_TYPE_NONE,
-    OP_TYPE_UNARY,
-    OP_TYPE_BINARY,
-} operator_type;
+#include <optional>
 
-typedef enum operator_enum {
+#include "token.h"
+
+class Operator {
+public:
+    enum OperatorEnum {
 
 #define OP(name, tok) name ,
 
 #include "def_operators.txt"
 
 #undef OP
+    
+    };
 
-} operator_enum;
+private:
+    OperatorEnum value;
+
+public:
+    Operator(OperatorEnum value) : value(value) {}
+
+    bool operator==(const Operator& other) {
+        return value == other.value;
+    }
+    bool operator==(OperatorEnum value) {
+        return this->value == value;
+    }
+
+    OperatorEnum operator()() const {
+        return value;
+    }
+
+    std::optional<TokenType> get_token_type() const;
+};
