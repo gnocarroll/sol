@@ -3,7 +3,7 @@ export
 
 CFLAGS= -g -std=c++2b -Wall -Werror -I$(INCLUDE_DIR) -I$(RESOURCE_DIR) 
 
-SRC_FILES=$(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES=$(wildcard $(SRC_DIR)/*.cpp $(SRC_DIR)/*/*.cpp $(SRC_DIR)/*/*/*.cpp)
 OBJ_FILES=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
 MAIN_EXE_PATH=$(BIN_DIR)/$(MAIN_EXE)
@@ -15,7 +15,7 @@ $(MAIN_EXE_PATH): $(OBJ_FILES)
 	$(CXX) $(OBJ_FILES) -o $@
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean

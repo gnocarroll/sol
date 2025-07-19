@@ -2,8 +2,10 @@
 
 import os
 import subprocess
+import sys
 
 from pathlib import Path
+from typing import Generator, Optional
 
 from .dotenv import read_dotenv
 
@@ -18,33 +20,52 @@ MAIN_EXE_PATH = os.path.join(
     DOTENV_VARS["MAIN_EXE"],
 )
 
+TEST_RESOURCES = "./test_resources"
+
 
 os.chdir(PROJECT_DIR)
 
-
 subprocess.run(["make"], check=True)
 
-
-tests = [
-    ("1", "1"),
-    ("1 + 1", "2"),
-    ("1 - 1", "0"),
-    ("5 * 5", "25"),
-    ("10 / 3", "3"),
-    ("20 % 3", "2"),
-    ("2 ** 3", "8"),
-    ("5 + 5 ** 2", "30"),
-    ("5 + 5 *   5    **    2", "130"),
-    ("5 / 3 * 10", "10"),
-    ("5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5 + -5 + 5", "5"),
-]
+if not os.path.isdir(TEST_RESOURCES):
+    sys.exit(f"directory containing tests {TEST_RESOURCES} not found")
 
 
-test_count = len(tests)
+def _file_to_str(path: str) -> Optional[str]:
+    try:
+        with open(path, "r") as f:
+            return f.read()
+    except OSError:
+        return None
+
+def _listdir_paths(path: str) -> Generator[str]:
+    for filename in os.listdir(path):
+        yield os.path.join(path, filename)
+
+
+test_dirs = _listdir_paths(TEST_RESOURCES)
+test_count = 0
 passed = 0
 
+CODE_FILENAME = "code.txt"
+EXPECTED_FILENAME = "output.txt"
 
-for test_idx, (input, expected_output) in enumerate(tests, start=1):
+for test_dir in test_dirs:
+    test_count += 1
+
+    code_path = os.path.join(test_dir, CODE_FILENAME)
+    expected_path = os.path.join(test_dir, EXPECTED_FILENAME)
+
+    code_txt = _file_to_str(code_path)
+    expected_output = _file_to_str(expected_path)
+
+    if code_txt is None:
+        print(f"For test {test_count} failed to read {code_path} as str")
+        continue
+    if expected_output is None:
+        print(f"For test {test_count} failed to read {expected_path} as str")
+        continue
+
     exe_err = False
     actual_output = ""
     ret_code = 0
@@ -55,7 +76,7 @@ for test_idx, (input, expected_output) in enumerate(tests, start=1):
                 MAIN_EXE_PATH,
             ],
             capture_output=True,
-            input=input,
+            input=code_txt,
             text=True,
             check=True,
         )
@@ -76,7 +97,7 @@ for test_idx, (input, expected_output) in enumerate(tests, start=1):
     if test_passed:
         passed += 1
     else:
-        print(f"Test {test_idx} failed.")
+        print(f"Test {test_count} failed.")
 
         if exe_err:
             print(f"Executable exited with code {ret_code}")
@@ -85,7 +106,6 @@ for test_idx, (input, expected_output) in enumerate(tests, start=1):
             print(expected_output)
             print("Actual output ---")
             print(actual_output)
-
 
 print()
 print(f"TESTS PASSED: {passed}/{test_count}")

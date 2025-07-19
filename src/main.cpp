@@ -1,22 +1,30 @@
 #include <iostream>
 
+#include "ast/ast_builder.h"
 #include "char_stream.h"
-#include "parse_expr.h"
+#include "parse.h"
 
 int main(void) {
-    std::string line;
+    auto ast_builder = ast::ASTBuilder(CharStream(std::cin));
 
-    while (std::getline(std::cin, line)) {
-        std::istringstream isstream(line);
-        CharStream cstream(isstream);
+    auto program = parse::parse_program(ast_builder);
 
-        auto expr = parse_expr(cstream);
-        auto value = (*expr)->eval();
+    if (ast_builder.n_errs() > 0) {
+        for (const auto& err : ast_builder.get_errs()) {
+            std::cerr << "line " << err.get_line_no() << ", ";
+            std::cerr << "pos " << err.get_line_offset() << ": ";
 
-        if (value) std::cout << *value;
-        else std::cout << "ERR";
+            std::cerr << err.get_err_msg();
+            std::cerr << '\n';
+        }
 
-        std::cout << '\n';
+        return 1;
+    }
+
+    auto ret_code = program.execute();
+
+    if (ret_code.is_err()) {
+        std::cout << *ret_code.get_err_msg() << '\n';
     }
 
     return 0;

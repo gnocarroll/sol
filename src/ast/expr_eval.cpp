@@ -1,29 +1,6 @@
-#include "expr.h"
+#include "ast/expr.h"
 
-#include <cmath>
-
-void BinaryExpr::print(std::ostream &ostream) {
-    ostream << '(';
-    auto ttype = op.get_token_type();
-
-    if (!ttype) ostream << "ERR";
-    else {
-        auto ttext = ttype->get_text();
-
-        if (!ttext) ostream << "ERR";
-        else ostream << *ttext;
-    }
-
-    ostream << ' ';
-
-    lhs->print(ostream);
-
-    ostream << ' ';
-
-    rhs->print(ostream);
-
-    ostream << ')';
-}
+namespace ast {
 
 std::optional<long> BinaryExpr::eval() {
     auto lhs_val = lhs->eval();
@@ -51,25 +28,6 @@ std::optional<long> BinaryExpr::eval() {
     return {};
 }
 
-void UnaryExpr::print(std::ostream &ostream) {
-    ostream << '(';
-    auto ttype = op.get_token_type();
-
-    if (!ttype) ostream << "ERR";
-    else {
-        auto text = ttype->get_text();
-
-        if (!text) ostream << "ERR";
-        else ostream << *text;
-    }
-
-    ostream << ' ';
-
-    sub_expr->print(ostream);
-
-    ostream << ')';
-}
-
 std::optional<long> UnaryExpr::eval() {
     auto sub_expr_val = sub_expr->eval();
 
@@ -85,4 +43,12 @@ std::optional<long> UnaryExpr::eval() {
     }
 
     return {};
+}
+
+std::optional<long> InstanceExpr::eval() {
+    if (instance.has_err()) return {};
+
+    return instance.value;
+}
+
 }
