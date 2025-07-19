@@ -16,15 +16,18 @@ std::optional<char> CharStream::getc() {
 
 std::optional<char> CharStream::peekc() {
     if (buffer_idx >= buffer.size()) {
-        char c;
+        if (eof_flag) return {};
 
-        if (!(in_stream >> c)) {
-            return {};
-        }
+        std::string line;
 
-        buffer.push_back(c);
+        std::getline(in_stream, line);
 
-        if (c == '\n') line_starts.push_back(buffer.size());
+        buffer += line;
+        buffer += "\n";
+
+        line_starts.push_back(buffer.size());
+
+        if (in_stream.eof() || in_stream.fail()) eof_flag = true;
     }
 
     return buffer[buffer_idx];
@@ -67,6 +70,9 @@ std::optional<StringLinePair> CharStream::get_line(size_t req_line_no, size_t fi
     if (req_line_no >= line_starts.size()) return {};
 
     size_t line_start_idx = line_starts[req_line_no];
+
+    if (line_start_idx >= buffer.size()) return {};
+
     size_t line_end_idx =
         req_line_no + 1 < line_starts.size() ?
             line_starts[req_line_no + 1] : buffer.size();

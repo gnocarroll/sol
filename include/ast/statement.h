@@ -80,11 +80,9 @@ public:
     DECL_STATEMENT_FUNCS
 };
 
-class ErrStatement final : public Statement, public HasErrMsg {
+class ErrStatement final : public Statement {
 public:
-    ErrStatement(std::string&& err_msg, CharStream &cstream, size_t back = 0) :
-        HasErrMsg(std::move(err_msg), cstream, back) {
-
+    ErrStatement() {
         set_err();
     }
 

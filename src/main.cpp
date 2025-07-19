@@ -1,16 +1,19 @@
 #include <iostream>
 
+#include "ast/ast_builder.h"
 #include "char_stream.h"
 #include "parse.h"
 
 int main(void) {
-    CharStream cstream(std::cin);
+    auto ast_builder = ast::ASTBuilder(CharStream(std::cin));
 
-    auto program = parse::parse_program(cstream);
+    auto program = parse::parse_program(ast_builder);
 
-    if (program.has_err()) {
-        std::cerr << "Err occurred while building AST, exiting.\n";
-        return 1;
+    if (ast_builder.n_errs() > 0) {
+        for (const auto& err : ast_builder.get_errs()) {
+            std::cerr << err.get_err_msg();
+            std::cerr << '\n';
+        }
     }
 
     auto ret_code = program.execute();

@@ -46,7 +46,7 @@ std::optional<long> UnaryExpr::eval() {
 }
 
 std::optional<long> InstanceExpr::eval() {
-    if (instance.err) return {};
+    if (instance.has_err()) return {};
 
     return instance.value;
 }

@@ -13,13 +13,13 @@ RetCode CompoundStatement::execute() {
 }
 
 RetCode CreateStatement::execute() {
-    if (instance.err) return RetCode("error in instance");
+    if (instance.has_err()) return RetCode("error in instance");
     if (!expr) return RetCode::ok();
 
     auto val = (*expr)->eval();
 
     if (!val) {
-        instance.err = true;
+        instance.set_err();
         return RetCode("expression evaluation failed");
     }
 
@@ -29,12 +29,12 @@ RetCode CreateStatement::execute() {
 }
 
 RetCode ModifyStatement::execute() {
-    if (instance.err) return RetCode("error in instance");
+    if (instance.has_err()) return RetCode("error in instance");
 
     auto val = expr->eval();
 
     if (!val) {
-        instance.err = true;
+        instance.set_err();
         return RetCode("expr evaluation failed");
     }
 

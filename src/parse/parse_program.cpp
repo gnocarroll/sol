@@ -2,12 +2,12 @@
 
 namespace parse {
 
-ast::Program parse_program(CharStream &cstream) {
+ast::Program parse_program(ast::ASTBuilder& ast_builder) {
     ast::Scope global_scope;
     ast::CompoundStatement statements;
 
     while (true) {
-        auto statement = parse_statement(cstream, global_scope);
+        auto statement = parse_statement(ast_builder, global_scope);
 
         if (!statement) break;
 

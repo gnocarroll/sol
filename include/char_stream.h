@@ -53,6 +53,8 @@ public:
     };
 
 private:
+    bool eof_flag = false;
+
     size_t buffer_idx = 0;
     std::string buffer;
 
@@ -64,14 +66,7 @@ private:
 
 public:
 
-    // this last one is most useful for std::cin
-    // otherwise maybe more desirable to give this ownership of istream
-    CharStream(std::istream& in_stream) : in_stream(in_stream) {
-        in_stream >> std::noskipws;
-    }
-    ~CharStream() {
-        in_stream >> std::skipws;
-    }
+    CharStream(std::istream& in_stream) : in_stream(in_stream) {}
 
     std::optional<char> getc();
     std::optional<char> peekc();

@@ -90,10 +90,9 @@ public:
     DECL_EXPR_FUNCS
 };
 
-class ErrExpr final : public Expr, public HasErrMsg {
+class ErrExpr final : public Expr {
 public:
-    ErrExpr(std::string &&err_msg, CharStream &cstream, size_t back = 0) :
-        HasErrMsg(std::move(err_msg), cstream, back) {
+    ErrExpr() {
         set_err();
     }
 
