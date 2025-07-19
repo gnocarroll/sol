@@ -5,18 +5,18 @@
 
 #include "char_stream.h"
 #include "file_pos.h"
+#include "mixins.h"
 
 namespace ast {
 
 class ASTBuilder {
 public:
-    struct ASTErr {
-        FilePos file_pos;
+    struct ASTErr : public HasFilePos {
         std::string err_msg;
 
         ASTErr() {}
         ASTErr(FilePos file_pos, std::string &&err_msg) :
-            file_pos(file_pos), err_msg(std::move(err_msg)) {}
+            HasFilePos(file_pos), err_msg(std::move(err_msg)) {}
 
         const std::string& get_err_msg() const {
             return err_msg;
