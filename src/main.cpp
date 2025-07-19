@@ -21,10 +21,13 @@ int main(void) {
         return 1;
     }
 
-    auto ret_code = program.execute();
+    program.execute();
 
-    if (ret_code.is_err()) {
-        std::cout << *ret_code.get_err_msg() << '\n';
+    if (program.ctx.n_errs() > 0) {
+        for (const auto& err : program.ctx.get_errs()) {
+            std::cerr << err.get_err_msg();
+            std::cerr << '\n';
+        }
     }
 
     return 0;

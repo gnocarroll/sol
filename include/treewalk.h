@@ -9,13 +9,13 @@
 namespace treewalk {
 
 class ExecutionErr : public LangErr {
+public:
     ast::ASTObject& source;
 
-public:
     ExecutionErr(ast::ASTObject& source) :
         source(source) {}
     ExecutionErr(ast::ASTObject& source, std::string&& err_msg) :
-        source(source), LangErr(std::move(err_msg)) {}
+        LangErr(std::move(err_msg)), source(source) {}
 };
 
 class ExecutionContext : public ErrorRegistry<ExecutionErr> {

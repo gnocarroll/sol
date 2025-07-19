@@ -10,11 +10,11 @@ void CompoundStatement::execute(treewalk::ExecutionContext& ctx) {
     }
 }
 
-void IfStatement::execute(treewalk::ExecutionContext& ctx) {
+void IfStatement::execute(treewalk::ExecutionContext& ctx) {    
     if (if_thens.size() == 0)
 
     for (auto& if_then : if_thens) {
-
+        (void) if_then;
     }
 }
 

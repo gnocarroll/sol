@@ -77,7 +77,7 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
-    std::optional<long> eval() {
+    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
         return value;
     }
 };

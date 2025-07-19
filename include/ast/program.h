@@ -1,6 +1,6 @@
 #pragma once
 
-#include "execute.h"
+#include "treewalk.h"
 #include "ast/ast_object.h"
 #include "ast/scope.h"
 #include "ast/statement.h"
@@ -12,6 +12,8 @@ class Program : public ASTObject {
     CompoundStatement statements;
 
 public:
+    treewalk::ExecutionContext ctx;
+
     Program(Scope&& global_scope, CompoundStatement&& statements) :
         global_scope(global_scope), statements(std::move(statements)) {
 
@@ -20,8 +22,8 @@ public:
         }
     }
 
-    RetCode execute() {
-        return statements.execute();
+    void execute() {
+        return statements.execute(ctx);
     }
 };
 
