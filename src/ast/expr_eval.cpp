@@ -2,9 +2,9 @@
 
 namespace ast {
 
-std::optional<long> BinaryExpr::eval() {
-    auto lhs_val = lhs->eval();
-    auto rhs_val = rhs->eval();
+std::optional<long> BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
+    auto lhs_val = lhs->eval(ctx);
+    auto rhs_val = rhs->eval(ctx);
 
     if (!lhs_val || !rhs_val) return {};
 
@@ -22,14 +22,18 @@ std::optional<long> BinaryExpr::eval() {
         case Operator::OP_POW:
             return std::pow(*lhs_val, *rhs_val);
         default:
+            ctx.register_error(
+                *this,
+                "attempted to execute binary expression containing unsupported/invalid operation"
+            );
             break;
     }
 
     return {};
 }
 
-std::optional<long> UnaryExpr::eval() {
-    auto sub_expr_val = sub_expr->eval();
+std::optional<long> UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
+    auto sub_expr_val = sub_expr->eval(ctx);
 
     if (!sub_expr_val) return {};
 
@@ -39,13 +43,17 @@ std::optional<long> UnaryExpr::eval() {
         case Operator::OP_SUB:
             return -*sub_expr_val;
         default:
+            ctx.register_error(
+                *this,
+                "attempted to execute unary expression with unsupported/invalid operator"
+            );
             break;
     }
 
     return {};
 }
 
-std::optional<long> InstanceExpr::eval() {
+std::optional<long> InstanceExpr::eval(treewalk::ExecutionContext& ctx) {
     if (instance.has_err()) return {};
 
     return instance.value;

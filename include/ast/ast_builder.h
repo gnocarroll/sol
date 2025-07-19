@@ -5,26 +5,19 @@
 
 #include "char_stream.h"
 #include "file_pos.h"
+#include "lang_err.h"
 #include "mixins.h"
 
 namespace ast {
 
-class ASTBuilder {
-public:
-    struct ASTErr : public HasFilePos {
-        std::string err_msg;
+struct ASTErr : public HasFilePos, public LangErr {
+    ASTErr() {}
+    ASTErr(FilePos file_pos, std::string &&err_msg) :
+        HasFilePos(file_pos), LangErr(std::move(err_msg)) {}
+};
 
-        ASTErr() {}
-        ASTErr(FilePos file_pos, std::string &&err_msg) :
-            HasFilePos(file_pos), err_msg(std::move(err_msg)) {}
-
-        const std::string& get_err_msg() const {
-            return err_msg;
-        }
-    };
-
+class ASTBuilder : public ErrorRegistry<ASTErr> {
 private:
-    std::vector<ASTErr> errors;
     size_t cstream_lookback = 0;
 
 public:
@@ -51,17 +44,9 @@ public:
         cstream(std::move(cstream)) {}
 
     void register_error(std::string&& err_msg) {
-        errors.emplace_back(
-            cstream.get_file_pos(cstream_lookback),
-            std::move(err_msg)
+        ErrorRegistry<ASTErr>::register_error(
+            ASTErr(cstream.get_file_pos(cstream_lookback), std::move(err_msg))
         );
-    }
-
-    size_t n_errs() const {
-        return errors.size();
-    }
-    const auto& get_errs() const {
-        return errors;
     }
 
     auto create_char_lookback(size_t lookback) {

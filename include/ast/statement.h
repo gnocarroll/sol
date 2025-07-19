@@ -5,13 +5,13 @@
 #include <optional>
 #include <vector>
 
-#include "execute.h"
 #include "ast/ast_object.h"
 #include "ast/expr.h"
 #include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
 #include "mixins.h"
+#include "treewalk.h"
 
 namespace ast {
 
@@ -19,11 +19,11 @@ class Statement : public ASTObject {
 public:
     virtual ~Statement() {}
 
-    virtual RetCode execute() = 0;
+    virtual void execute(treewalk::ExecutionContext& ctx) = 0;
 };
 
 #define DECL_STATEMENT_FUNCS \
-    RetCode execute();
+    void execute(treewalk::ExecutionContext& ctx);
 
 DEF_PTR_TYPES(Statement)
 
@@ -40,6 +40,38 @@ public:
             set_err();
         }
     }
+
+    DECL_STATEMENT_FUNCS
+};
+
+class IfStatement : public Statement {
+public:
+    class ConditionAndBody {
+        ExprPtr condition;
+        CompoundStatement if_body;
+    };
+
+private:
+    std::vector<ConditionAndBody> if_thens;
+
+    std::optional<CompoundStatement> else_body;
+
+public:
+    IfStatement(
+        std::vector<ConditionAndBody>&& if_thens,
+        std::optional<CompoundStatement>&& else_body
+    ) : if_thens(std::move(if_thens)), else_body(std::move(else_body)) {}
+
+    DECL_STATEMENT_FUNCS
+};
+
+class WhileStatement : public Statement {
+    ExprPtr condition;
+    CompoundStatement while_body;
+
+public:
+    WhileStatement(ExprPtr&& condition, CompoundStatement&& while_body) :
+        condition(std::move(condition)), while_body(std::move(while_body)) {}
 
     DECL_STATEMENT_FUNCS
 };

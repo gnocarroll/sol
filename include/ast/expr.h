@@ -12,6 +12,7 @@
 #include "instance.h"
 #include "macros.h"
 #include "operator.h"
+#include "treewalk.h"
 
 namespace ast {
 
@@ -21,12 +22,12 @@ public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
-    virtual std::optional<long> eval() = 0;
+    virtual std::optional<long> eval(treewalk::ExecutionContext& ctx) = 0;
 };
 
 #define DECL_EXPR_FUNCS \
     void print(std::ostream& ostream = std::cout); \
-    std::optional<long> eval();
+    std::optional<long> eval(treewalk::ExecutionContext& ctx);
 
 DEF_PTR_TYPES(Expr)
 
@@ -99,8 +100,11 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << "ERR";
     }
-    std::optional<long> eval() {
-        // TODO: stop on err
+    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
+        ctx.register_error(
+            *this,
+            "attempted to execute expression which could not be compiled/constructed correctly"
+        );
         return {};
     }
 };

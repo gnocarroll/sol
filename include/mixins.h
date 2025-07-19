@@ -5,6 +5,32 @@
 
 #include "char_stream.h"
 #include "file_pos.h"
+#include "lang_err.h"
+
+template <typename Err>
+class ErrorRegistry {
+    std::vector<Err> errors;
+
+public:
+    ErrorRegistry() {
+        static_assert(
+            std::is_base_of_v<LangErr,Err>,
+            "provided class must be derived from LangErr"
+        );
+    }
+
+    template <typename... Args>
+    void register_error(Args&&... err) {
+        errors.emplace_back(std::forward<Args>(err)...);
+    }
+
+    size_t n_errs() const {
+        return errors.size();
+    }
+    const auto& get_errs() const {
+        return errors;
+    }
+};
 
 class HasErrFlag {
     bool err = false;

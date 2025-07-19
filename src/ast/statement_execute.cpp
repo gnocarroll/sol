@@ -2,66 +2,68 @@
 
 namespace ast {
 
-RetCode CompoundStatement::execute() {
+void CompoundStatement::execute(treewalk::ExecutionContext& ctx) {
     for (auto& statement : statements) {
-        auto stmt_ret = statement->execute();
+        statement->execute(ctx);
 
-        if (stmt_ret.is_err()) return stmt_ret;
+        if (ctx.n_errs() > 0) return;
     }
-
-    return RetCode::ok();
 }
 
-RetCode CreateStatement::execute() {
-    if (instance.has_err()) return RetCode("error in instance");
-    if (!expr) return RetCode::ok();
+void IfStatement::execute(treewalk::ExecutionContext& ctx) {
+    if (if_thens.size() == 0)
 
-    auto val = (*expr)->eval();
+    for (auto& if_then : if_thens) {
+
+    }
+}
+
+void CreateStatement::execute(treewalk::ExecutionContext& ctx) {
+    if (instance.has_err() || !expr) return;
+
+    auto val = (*expr)->eval(ctx);
 
     if (!val) {
         instance.set_err();
-        return RetCode("expression evaluation failed");
+        return;
     }
 
     instance.value = (*val);
-
-    return RetCode::ok();
 }
 
-RetCode ModifyStatement::execute() {
-    if (instance.has_err()) return RetCode("error in instance");
+void ModifyStatement::execute(treewalk::ExecutionContext& ctx) {
+    if (instance.has_err()) return;
 
-    auto val = expr->eval();
+    auto val = expr->eval(ctx);
 
     if (!val) {
         instance.set_err();
-        return RetCode("expr evaluation failed");
+        return;
     }
 
     instance.value = *val;
-
-    return RetCode::ok();
 }
 
-RetCode PrintStatement::execute() {
+void PrintStatement::execute(treewalk::ExecutionContext& ctx) {
     if (!expr) {
         std::cout << '\n';
-        return RetCode::ok();
+        return;
     }
 
-    auto val = (*expr)->eval();
+    auto val = (*expr)->eval(ctx);
 
     if (!val) {
-        return RetCode("expression evaluation failed");
+        // in general do not register new errors if one has already occurred
+        return;
     }
 
     std::cout << *val << '\n';
 
-    return RetCode::ok();
+    return;
 }
 
-RetCode ErrStatement::execute() {
-    return RetCode("cannot execute malformed error statement");
+void ErrStatement::execute(treewalk::ExecutionContext& ctx) {
+    return;
 }
 
 }
