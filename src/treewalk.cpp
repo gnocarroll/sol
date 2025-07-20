@@ -1,6 +1,6 @@
 #include "treewalk.h"
 
-#include <cmath
+#include <cmath>
 
 namespace treewalk {
     LiveValuePtr LiveIntegerValue::unary(Operator op) const {
@@ -31,14 +31,24 @@ namespace treewalk {
 
         switch (op()) {
         
-        #define OP_CASE(name, op) case Operator:: OP_ ## name : \
+        #define OP_RET_INT(name, op) case Operator:: OP_ ## name : \
             return std::make_unique<LiveIntegerValue>((*this)() op (*other_integer)());
 
-        OP_CASE(ADD, +)
-        OP_CASE(SUB, -)
-        OP_CASE(MULT, *)
-        OP_CASE(DIV, /)
-        OP_CASE(MOD, %)
+        OP_RET_INT(ADD, +)
+        OP_RET_INT(SUB, -)
+        OP_RET_INT(MULT, *)
+        OP_RET_INT(DIV, /)
+        OP_RET_INT(MOD, %)
+
+        #define OP_RET_BOOL(name, op) case Operator:: OP_ ## name : \
+            return std::make_unique<LiveBooleanValue>((*this)() op (*other_integer)());
+
+        OP_RET_BOOL(LT, <)
+        OP_RET_BOOL(GT, >)
+        OP_RET_BOOL(LE, <=)
+        OP_RET_BOOL(GE, >=)
+        OP_RET_BOOL(EQ, ==)
+        OP_RET_BOOL(NEQ, !=)
 
         case Operator::OP_POW:
             return std::make_unique<LiveIntegerValue>((int64_t) std::pow(
