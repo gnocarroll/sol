@@ -1,5 +1,7 @@
 #include "treewalk.h"
 
+#include <cmath
+
 namespace treewalk {
     LiveValuePtr LiveIntegerValue::unary(Operator op) const {
         auto ret = clone_ptr();
@@ -23,7 +25,32 @@ namespace treewalk {
     }
 
     LiveValuePtr LiveIntegerValue::binary(Operator op, const LiveValuePtr& other) const {
+        LiveIntegerValue *other_integer = dynamic_cast<LiveIntegerValue*>(other.get());
 
+        if (!other_integer) return LiveErrValue::create();
+
+        switch (op()) {
+        
+        #define OP_CASE(name, op) case Operator:: OP_ ## name : \
+            return std::make_unique<LiveIntegerValue>((*this)() op (*other_integer)());
+
+        OP_CASE(ADD, +)
+        OP_CASE(SUB, -)
+        OP_CASE(MULT, *)
+        OP_CASE(DIV, /)
+        OP_CASE(MOD, %)
+
+        case Operator::OP_POW:
+            return std::make_unique<LiveIntegerValue>((int64_t) std::pow(
+                (*this)(),
+                (*other_integer)()
+            ));
+        default:
+            break;
+
+        }
+
+        return LiveErrValue::create();
     }
 
     LiveValuePtr LiveBooleanValue::unary(Operator op) const {
@@ -40,7 +67,20 @@ namespace treewalk {
     }
 
     LiveValuePtr LiveBooleanValue::binary(Operator op, const LiveValuePtr& other) const {
+        LiveBooleanValue *other_bool = dynamic_cast<LiveBooleanValue*>(other.get());
 
+        if (!other_bool) return LiveErrValue::create();
+        
+        switch (op()) {
+        case Operator::OP_EQ:
+            return std::make_unique<LiveBooleanValue>((*this)() == (*other_bool)());
+        case Operator::OP_NEQ:
+            return std::make_unique<LiveBooleanValue>((*this)() != (*other_bool)());
+        default:
+            break;
+        }
+
+        return LiveErrValue::create();
     }
     
     LiveValuePtr LiveErrValue::unary(Operator op) const {
