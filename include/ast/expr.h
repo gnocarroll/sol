@@ -8,6 +8,7 @@
 #include <string>
 
 #include "ast/ast_object.h"
+#include "ast/type.h"
 #include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
@@ -17,12 +18,20 @@
 namespace ast {
 
 class Expr : public ASTObject {
-public:
+    const LangType *lang_type = &lang_err_type;
 
+public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
     virtual std::optional<long> eval(treewalk::ExecutionContext& ctx) = 0;
+
+    void set_lang_type(const LangType& lang_type) {
+        this->lang_type = &lang_type;
+    }
+    const LangType& get_lang_type() const {
+        return *lang_type;
+    }
 };
 
 #define DECL_EXPR_FUNCS \
@@ -37,12 +46,21 @@ public:
     const Operator op;
     const ExprPtr rhs;
 
-    BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
-        lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {
+    BinaryExpr(ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
+        lhs(std::move(_lhs)), op(op), rhs(std::move(_rhs)) {
         
-        if (this->lhs->has_err() || this->rhs->has_err()) {
+        if (lhs->has_err() || rhs->has_err()) {
             set_err();
         }
+
+        const auto& lhs_type = lhs->get_lang_type();
+        const auto& rhs_type = rhs->get_lang_type();
+
+        if (&lhs_type != &rhs_type) return;
+
+        Expr::set_lang_type(
+            lhs_type.get_binary_op_ret_type(op)
+        );
     };
 
     DECL_EXPR_FUNCS
@@ -54,10 +72,14 @@ public:
     const Operator op;
     const ExprPtr sub_expr;
 
-    UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {
-        if (this->sub_expr->has_err()) {
+    UnaryExpr(Operator op, ExprPtr&& _sub_expr) : op(op), sub_expr(std::move(_sub_expr)) {
+        if (sub_expr->has_err()) {
             set_err();
         }
+
+        Expr::set_lang_type(
+            sub_expr->get_lang_type().get_unary_op_ret_type(op)
+        );
     }
 
     DECL_EXPR_FUNCS
@@ -68,11 +90,29 @@ public:
     virtual ~LiteralExpr() {};
 };
 
+class BooleanLiteralExpr final : public LiteralExpr {
+public:
+    const bool value;
+
+    BooleanLiteralExpr(bool value) : value(value) {
+        Expr::set_lang_type(lang_bool);
+    }
+
+    void print(std::ostream &ostream = std::cout) {
+        ostream << value;
+    }
+    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
+        return value;
+    }
+};
+
 class IntegerLiteralExpr final : public LiteralExpr {
 public:
     const long value;
 
-    IntegerLiteralExpr(long value) : value(value) {}
+    IntegerLiteralExpr(long value) : value(value) {
+        Expr::set_lang_type(lang_integer);
+    }
 
     void print(std::ostream &ostream = std::cout) {
         ostream << value;

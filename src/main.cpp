@@ -3,8 +3,13 @@
 #include "ast/ast_builder.h"
 #include "char_stream.h"
 #include "parse.h"
+#include "ast/value.h"
 
 int main(void) {
+    for (auto op : ast::Value::get_supported_ops()) {
+        std::cout << op() << "\n";
+    }
+
     auto ast_builder = ast::ASTBuilder(CharStream(std::cin));
 
     auto program = parse::parse_program(ast_builder);

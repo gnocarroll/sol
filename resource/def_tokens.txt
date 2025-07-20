@@ -17,6 +17,17 @@ TOK(TOK_R_PAREN, ")")
 TOK(TOK_EQUAL, "=")
 TOK(TOK_COLON_EQUAL, ":=")
 
+TOK(TOK_NOT, "not")
+
+TOK(TOK_LT, "<")
+TOK(TOK_LE, "<=")
+
+TOK(TOK_GT, ">")
+TOK(TOK_GE, ">=")
+
+TOK(EQUAL_EQUAL, "==")
+TOK(EXCL_EQUAL, "!=")
+
 TOK(TOK_NEWLINE, "\n")
 
 TOK(TOK_EOF, "")
