@@ -17,21 +17,12 @@
 
 namespace ast {
 
-class Expr : public ASTObject {
-    const LangType *lang_type = &lang_err_type;
-
+class Expr : public ASTObject, public Value {
 public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
     virtual treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) = 0;
-
-    void set_lang_type(const LangType& lang_type) {
-        this->lang_type = &lang_type;
-    }
-    const LangType& get_lang_type() const {
-        return *lang_type;
-    }
 };
 
 #define DECL_EXPR_FUNCS \
@@ -58,7 +49,7 @@ public:
 
         if (&lhs_type != &rhs_type) return;
 
-        Expr::set_lang_type(
+        Value::set_lang_type(
             lhs_type.get_binary_op_ret_type(op)
         );
     };
@@ -102,7 +93,7 @@ public:
         ostream << value;
     }
     treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
-        return std::make_unique<treewalk::BooleanValue>(value);
+        return std::make_unique<treewalk::LiveBooleanValue>(value);
     }
 };
 
@@ -118,7 +109,7 @@ public:
         ostream << value;
     }
     treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
-        return std::make_unique<treewalk::IntegerValue>(value);
+        return std::make_unique<treewalk::LiveIntegerValue>(value);
     }
 };
 

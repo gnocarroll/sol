@@ -4,15 +4,17 @@
 #include <string>
 
 #include "ast/ast_object.h"
+#include "ast/value.h"
 
 namespace ast {
 
-class Instance : public ASTObject {
+class Instance : public ASTObject, public Value {
 public:
     const std::string name;
-    std::optional<long> value;
 
     Instance(std::string&& name) : name(std::move(name)) {}
+    Instance(std::string&& name, const LangType& lang_type) :
+        Value(lang_type), name(std::move(name)) {}
 };
 
 }
