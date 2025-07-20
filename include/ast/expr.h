@@ -22,12 +22,12 @@ public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
-    virtual treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) = 0;
+    virtual treewalk::LiveValuePtr eval(treewalk::ExecutionContext& ctx) = 0;
 };
 
 #define DECL_EXPR_FUNCS \
     void print(std::ostream& ostream = std::cout); \
-    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx);
+    treewalk::LiveValuePtr eval(treewalk::ExecutionContext& ctx);
 
 DEF_DERIVED_TYPES(Expr)
 
@@ -92,7 +92,7 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
-    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
+    treewalk::OptionalLiveValuePtr eval(treewalk::ExecutionContext& ctx) {
         return std::make_unique<treewalk::LiveBooleanValue>(value);
     }
 };
@@ -108,7 +108,7 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
-    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
+    treewalk::OptionalLiveValuePtr eval(treewalk::ExecutionContext& ctx) {
         return std::make_unique<treewalk::LiveIntegerValue>(value);
     }
 };
@@ -131,12 +131,12 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << "ERR";
     }
-    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
+    treewalk::LiveValuePtr eval(treewalk::ExecutionContext& ctx) {
         ctx.register_error(
             *this,
-            "attempted to execute expression which could not be compiled/constructed correctly"
+            "attempted to evaluate expression which could not be compiled/constructed correctly"
         );
-        return {};
+        return treewalk::LiveErrValue::create();
     }
 };
 

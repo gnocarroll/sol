@@ -35,6 +35,15 @@ public:
     const ast::LangType& get_lang_type() const {
         return lang_type;
     }
+
+    bool is_err_value() const {
+        return false;
+    }
+
+    virtual std::unique_ptr<LiveValue> clone_ptr() const = 0;
+
+    virtual LiveValuePtr unary(Operator op) const = 0;
+    virtual LiveValuePtr binary(Operator op, const LiveValuePtr& other) const = 0;
 };
 
 DEF_DERIVED_TYPES(LiveValue)
@@ -48,6 +57,16 @@ public:
     bool& operator()() {
         return value;
     }
+    const bool& operator()() const {
+        return value;
+    }
+
+    LiveValuePtr clone_ptr() const {
+        return std::make_unique<LiveBooleanValue>(value);
+    }
+
+    LiveValuePtr unary(Operator op) const;
+    LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
 };
 
 class LiveIntegerValue final : public LiveValue {
@@ -59,6 +78,16 @@ public:
     int64_t& operator()() {
         return value;
     }
+    const int64_t& operator()() const {
+        return value;
+    }
+
+    LiveValuePtr clone_ptr() const {
+        return std::make_unique<LiveIntegerValue>(value);
+    }
+
+    LiveValuePtr unary(Operator op) const;
+    LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
 };
 
 class LiveErrValue final : public LiveValue {
@@ -69,9 +98,20 @@ public:
     static LiveValuePtr create() {
         return std::make_unique<LiveErrValue>();
     }
+
+    bool is_err_value() const {
+        return true;
+    }
+
+    LiveValuePtr clone_ptr() const {
+        return LiveErrValue::create();
+    }
+
+    LiveValuePtr unary(Operator op) const;
+    LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
 };
 
-class LiveInstance {
+class LiveInstance : public HasErrFlag {
     LiveValuePtr value = LiveErrValue::create();
 public:
     const ast::Instance& instance;

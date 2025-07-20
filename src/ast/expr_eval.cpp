@@ -2,11 +2,11 @@
 
 namespace ast {
 
-std::optional<long> BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
+treewalk::LiveValuePtr BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
     auto lhs_val = lhs->eval(ctx);
     auto rhs_val = rhs->eval(ctx);
 
-    if (!lhs_val || !rhs_val) return {};
+    if (lhs_val->is_err_value() || rhs_val->is_err_value()) return lhs_val;
 
     switch (op()) {
         case Operator::OP_ADD:
@@ -29,15 +29,18 @@ std::optional<long> BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
             break;
     }
 
-    return {};
+    return treewalk::LiveErrValue::create();
 }
 
-std::optional<long> UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
+treewalk::LiveValuePtr UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
     auto sub_expr_val = sub_expr->eval(ctx);
 
-    if (!sub_expr_val) return {};
+    if (sub_expr_val->is_err_value()) return sub_expr_val;
 
-    switch (op()) {
+    if (auto integer_value = dynamic_cast<treewalk::LiveIntegerValue*>(
+        sub_expr_val.get()
+    )) {
+        switch (op()) {
         case Operator::OP_ADD:
             return *sub_expr_val;
         case Operator::OP_SUB:
@@ -49,14 +52,21 @@ std::optional<long> UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
             );
             break;
     }
+    }
+    else if (auto boolean_value = dynamic_cast<treewalk::LiveBooleanValue*>(
+        sub_expr_val.get()
+    )) {
 
-    return {};
+    }
+
+    return treewalk::LiveErrValue::create();
 }
 
-std::optional<long> InstanceExpr::eval(treewalk::ExecutionContext& ctx) {
-    if (instance.has_err()) return {};
+treewalk::LiveValuePtr InstanceExpr::eval(treewalk::ExecutionContext& ctx) {
+    if (instance.has_err() ||
+        !ctx.live_instance_exists(instance.name)) return treewalk::LiveErrValue::create();
 
-    return instance.value;
+    return (*ctx.get_live_instance(instance.name)).get().get_value()->clone_ptr();
 }
 
 }
