@@ -1,6 +1,8 @@
 #pragma once
 
-#define DEF_PTR_TYPES(name) \
+#define DEF_DERIVED_TYPES(name) \
+    using Optional##name = std::optional< name >; \
+    \
     using name##Ptr = std::unique_ptr< name >; \
     using Optional##name##Ptr = std::optional< name##Ptr >; \
     template <typename E> \

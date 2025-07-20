@@ -25,7 +25,7 @@ public:
 #define DECL_STATEMENT_FUNCS \
     void execute(treewalk::ExecutionContext& ctx);
 
-DEF_PTR_TYPES(Statement)
+DEF_DERIVED_TYPES(Statement)
 
 class CompoundStatement : public Statement {
     std::vector<std::unique_ptr<Statement> > statements;

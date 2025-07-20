@@ -24,7 +24,7 @@ public:
     virtual ~Expr() {};
 
     virtual void print(std::ostream& ostream = std::cout) = 0;
-    virtual std::optional<long> eval(treewalk::ExecutionContext& ctx) = 0;
+    virtual treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) = 0;
 
     void set_lang_type(const LangType& lang_type) {
         this->lang_type = &lang_type;
@@ -36,9 +36,9 @@ public:
 
 #define DECL_EXPR_FUNCS \
     void print(std::ostream& ostream = std::cout); \
-    std::optional<long> eval(treewalk::ExecutionContext& ctx);
+    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx);
 
-DEF_PTR_TYPES(Expr)
+DEF_DERIVED_TYPES(Expr)
 
 class BinaryExpr final : public Expr {
 public:
@@ -101,8 +101,8 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
-    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
-        return value;
+    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
+        return std::make_unique<treewalk::BooleanValue>(value);
     }
 };
 
@@ -117,8 +117,8 @@ public:
     void print(std::ostream &ostream = std::cout) {
         ostream << value;
     }
-    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
-        return value;
+    treewalk::OptionalValuePtr eval(treewalk::ExecutionContext& ctx) {
+        return std::make_unique<treewalk::IntegerValue>(value);
     }
 };
 
