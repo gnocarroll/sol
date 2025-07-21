@@ -129,7 +129,9 @@
     <ClCompile Include="src\ast\expr_eval.cpp" />
     <ClCompile Include="src\ast\expr_print.cpp" />
     <ClCompile Include="src\ast\statement_execute.cpp" />
+    <ClCompile Include="src\ast\type.cpp" />
     <ClCompile Include="src\char_stream.cpp" />
+    <ClCompile Include="src\keywords.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\operator.cpp" />
     <ClCompile Include="src\parse\parse_expr.cpp" />
@@ -138,6 +140,7 @@
     <ClCompile Include="src\parse\parse_statement.cpp" />
     <ClCompile Include="src\test_token.cpp" />
     <ClCompile Include="src\token.cpp" />
+    <ClCompile Include="src\treewalk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ast\ast_builder.h" />
@@ -147,8 +150,11 @@
     <ClInclude Include="include\ast\program.h" />
     <ClInclude Include="include\ast\scope.h" />
     <ClInclude Include="include\ast\statement.h" />
+    <ClInclude Include="include\ast\type.h" />
+    <ClInclude Include="include\ast\value.h" />
     <ClInclude Include="include\char_stream.h" />
     <ClInclude Include="include\file_pos.h" />
+    <ClInclude Include="include\keywords.h" />
     <ClInclude Include="include\lang_err.h" />
     <ClInclude Include="include\macros.h" />
     <ClInclude Include="include\mixins.h" />
@@ -162,6 +168,9 @@
   <ItemGroup>
     <Text Include="resource\def_operators.txt" />
     <Text Include="resource\def_tokens.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\bugged_prog.sol" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
