@@ -9,31 +9,13 @@ In this repo I want to try developing a programming language by making
 end-to-end programs from the beginning rather than working by e.g. creating
 a scanner then a parser then type checking etc.
 
-Will begin by working on a C++ program that will take expressions as input
-on stdin and then, treating each line as a separate expression, will print
-the results on separate lines.
+Currently you can write extremely basic programs, and a signed integer and
+boolean type are supported. You can do basic operations and print out results.
+
+Unfortunately need to iron out some bugs right now before working on any
+more functionality.
 
 e.g.
-
-With input of:
-
-```
-1
-1 + 1
-3 * 3
-```
-
-Output should be:
-
-```
-1
-2
-9
-```
-
-Currently, this basic functionality seems to be working.
-
-Next will move on to basic script with integer variables and PRINT function.
 
 ```
 a := 1 + 1
@@ -42,6 +24,24 @@ b := 3
 a = a + b
 
 PRINT a
+PRINT a < b
 ```
 
-Should print 5. Once I get going may rework syntax a little
+(Should print 5, false on separate lines, currently bugged)
+
+I want to develop if, while statements nexts. To support that, I will add a
+notion of scoped to the language e.g. the following should work:
+
+```
+a := 1
+
+block
+    a := 2
+
+    PRINT a
+end block
+
+PRINT a
+```
+
+should print 1, 2
