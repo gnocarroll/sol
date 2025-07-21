@@ -123,7 +123,7 @@ static void skip_ignored_ws(CharStream &cstream) {
 
         char c = *maybe_next_char;
 
-        if (std::iswspace(c) && c != '\n') {
+        if (std::isspace(c) && c != '\n') {
             cstream.getc();
             continue;
         }
