@@ -18,6 +18,10 @@ ast::Program parse_program(ast::ASTBuilder& ast_builder) {
 
     parse_zero_plus_newlines(ast_builder);
 
+    if (ast_builder.cstream.peekc()) {
+        ast_builder.register_error("failed to parse statement");
+    }
+
     return ast::Program(
         std::move(global_scope),
         std::move(statements)
