@@ -17,6 +17,8 @@ TOK(TOK_R_PAREN, ")")
 TOK(TOK_EQUAL, "=")
 TOK(TOK_COLON_EQUAL, ":=")
 
+TOK(TOK_TRUE, "true")
+TOK(TOK_FALSE, "false")
 TOK(TOK_NOT, "not")
 
 TOK(TOK_LT, "<")

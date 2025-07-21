@@ -161,7 +161,14 @@ static ast::OptionalExprPtr parse_primary_expr(ast::ASTBuilder& ast_builder, ast
     return parse_literal_expr(ast_builder, scope);
 }
 
+static ast::OptionalExprPtr parse_integer_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope);
+static ast::OptionalExprPtr parse_boolean_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope);
+
 static ast::OptionalExprPtr parse_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope) {
+
+}
+
+static ast::OptionalExprPtr parse_integer_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope) {
     auto n_chars = match_token(ast_builder.cstream, TokenType::TOK_INTEGER);
 
     if (!n_chars) return {};
@@ -173,6 +180,16 @@ static ast::OptionalExprPtr parse_literal_expr(ast::ASTBuilder& ast_builder, ast
         nullptr,
         0 // make use of provided feature to autodetect base
     ));
+}
+
+static ast::OptionalExprPtr parse_boolean_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope) {
+    bool value;
+    
+    if (auto n_chars = match_token(ast_builder.cstream, TokenType::TOK_TRUE)) value = true;
+    else if (auto n_chars = match_token(ast_builder.cstream, TokenType::TOK_FALSE)) value = false;
+    else return {};
+
+    return std::make_unique<ast::BooleanLiteralExpr>(value);
 }
 
 }
