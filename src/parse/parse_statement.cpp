@@ -48,7 +48,10 @@ static ast::OptionalStatementPtr _parse_statement(ast::ASTBuilder& ast_builder, 
             expr = ast_builder.make_w_pos<ast::ErrExpr>();
         }
 
-        scope.push(ast::Instance(std::string(name)));
+        scope.push(ast::Instance(
+            std::string(name),
+            (*expr)->get_lang_type()
+        ));
 
         return std::make_unique<ast::CreateStatement>(
             *scope.get(name),

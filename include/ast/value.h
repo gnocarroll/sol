@@ -5,7 +5,7 @@
 namespace ast {
 
 class Value {
-    const LangType* lang_type;
+    const LangType* lang_type = &lang_err_type;
 
 public:
     Value() {}

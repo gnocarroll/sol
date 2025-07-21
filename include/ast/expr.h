@@ -147,7 +147,9 @@ class InstanceExpr final : public Expr {
     Instance &instance;
 
 public:
-    InstanceExpr(Instance &instance) : instance(instance) {}
+    InstanceExpr(Instance &instance) : instance(instance) {
+        Value::set_lang_type(instance.get_lang_type());
+    }
 
     DECL_EXPR_FUNCS
 };
@@ -156,6 +158,8 @@ class ErrExpr final : public Expr {
 public:
     ErrExpr() {
         set_err();
+
+        Value::set_lang_type(lang_err_type);
     }
 
     void print(std::ostream &ostream = std::cout) {
