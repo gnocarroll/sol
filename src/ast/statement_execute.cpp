@@ -19,29 +19,39 @@ void IfStatement::execute(treewalk::ExecutionContext& ctx) {
 }
 
 void CreateStatement::execute(treewalk::ExecutionContext& ctx) {
-    if (instance.has_err() || !expr) return;
+    if (instance.has_err()) return;
 
-    auto val = (*expr)->eval(ctx);
-
-    if (!val) {
-        instance.set_err();
+    if (!expr) {
+        ctx.add_live_instance(instance);
         return;
     }
 
-    instance.value = (*val);
+    auto val = (*expr)->eval(ctx);
+
+    ctx.add_live_instance(
+        instance,
+        std::move(val)
+    );
 }
 
 void ModifyStatement::execute(treewalk::ExecutionContext& ctx) {
     if (instance.has_err()) return;
 
-    auto val = expr->eval(ctx);
+    auto optional_live_instance = ctx.get_live_instance(instance.name);
 
-    if (!val) {
-        instance.set_err();
+    if (!optional_live_instance) {
+        ctx.register_error(
+            *this,
+            "attempted to run modify statement with unrecognized instance"
+        );
         return;
     }
 
-    instance.value = *val;
+    treewalk::LiveInstance& live_instance = *optional_live_instance;
+
+    auto val = expr->eval(ctx);
+
+    live_instance.set_value(std::move(val));
 }
 
 void PrintStatement::execute(treewalk::ExecutionContext& ctx) {
@@ -52,12 +62,7 @@ void PrintStatement::execute(treewalk::ExecutionContext& ctx) {
 
     auto val = (*expr)->eval(ctx);
 
-    if (!val) {
-        // in general do not register new errors if one has already occurred
-        return;
-    }
-
-    std::cout << *val << '\n';
+    std::cout << val->to_string() << '\n';
 
     return;
 }

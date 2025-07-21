@@ -44,6 +44,8 @@ public:
 
     virtual LiveValuePtr unary(Operator op) const = 0;
     virtual LiveValuePtr binary(Operator op, const LiveValuePtr& other) const = 0;
+
+    virtual std::string to_string() const = 0;
 };
 
 DEF_DERIVED_TYPES(LiveValue)
@@ -67,6 +69,10 @@ public:
 
     LiveValuePtr unary(Operator op) const;
     LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
+
+    std::string to_string() const {
+        return value ? "true" : "false";
+    }
 };
 
 class LiveIntegerValue final : public LiveValue {
@@ -88,6 +94,10 @@ public:
 
     LiveValuePtr unary(Operator op) const;
     LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
+
+    std::string to_string() const {
+        return std::to_string(value);
+    }
 };
 
 class LiveErrValue final : public LiveValue {
@@ -109,6 +119,10 @@ public:
 
     LiveValuePtr unary(Operator op) const;
     LiveValuePtr binary(Operator op, const LiveValuePtr& other) const;
+
+    std::string to_string() const {
+        return "ERR";
+    }
 };
 
 class LiveInstance : public HasErrFlag {
@@ -135,10 +149,14 @@ class ExecutionContext : public ErrorRegistry<ExecutionErr> {
     std::unordered_map<std::string,LiveInstance> live_instances;
 public:
 
-    void add_live_instance(const ast::Instance& instance) {
+    template <typename... Args>
+    void add_live_instance(Args&&... args) {
+        auto live_instance = LiveInstance(std::forward<Args>(args)...);
+        auto name = std::string(live_instance.instance.name);
+
         live_instances.emplace(std::make_pair(
-            std::string(instance.name),
-            LiveInstance(instance)
+            std::move(name),
+            std::move(live_instance)  
         ));
     }
     bool live_instance_exists(const std::string& name) const {
