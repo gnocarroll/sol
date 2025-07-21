@@ -68,6 +68,10 @@ void PrintStatement::execute(treewalk::ExecutionContext& ctx) {
 }
 
 void ErrStatement::execute(treewalk::ExecutionContext& ctx) {
+    ctx.register_error(
+        *this,
+        "attempted to execute statement which was not correctly compiled"
+    );
     return;
 }
 

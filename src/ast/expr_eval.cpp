@@ -2,7 +2,7 @@
 
 namespace ast {
 
-treewalk::LiveValuePtr BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
+treewalk::LiveValuePtr BinaryExpr::eval(treewalk::ExecutionContext& ctx) const {
     auto lhs_val = lhs->eval(ctx);
     auto rhs_val = rhs->eval(ctx);
 
@@ -20,7 +20,7 @@ treewalk::LiveValuePtr BinaryExpr::eval(treewalk::ExecutionContext& ctx) {
     return ret;
 }
 
-treewalk::LiveValuePtr UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
+treewalk::LiveValuePtr UnaryExpr::eval(treewalk::ExecutionContext& ctx) const {
     auto sub_expr_val = sub_expr->eval(ctx);
 
     if (sub_expr_val->is_err_value()) return sub_expr_val;
@@ -37,7 +37,7 @@ treewalk::LiveValuePtr UnaryExpr::eval(treewalk::ExecutionContext& ctx) {
     return ret;
 }
 
-treewalk::LiveValuePtr InstanceExpr::eval(treewalk::ExecutionContext& ctx) {
+treewalk::LiveValuePtr InstanceExpr::eval(treewalk::ExecutionContext& ctx) const {
     if (instance.has_err() ||
         !ctx.live_instance_exists(instance.name)) return treewalk::LiveErrValue::create();
 

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cstdint>
+#include <expected>
+#include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -42,8 +45,11 @@ public:
 
     virtual std::unique_ptr<LiveValue> clone_ptr() const = 0;
 
-    virtual LiveValuePtr unary(Operator op) const = 0;
-    virtual LiveValuePtr binary(Operator op, const LiveValuePtr& other) const = 0;
+    virtual std::unique_ptr<LiveValue> unary(Operator op) const = 0;
+    virtual std::unique_ptr<LiveValue> binary(
+        Operator op,
+        const std::unique_ptr<LiveValue>& other
+    ) const = 0;
 
     virtual std::string to_string() const = 0;
 };
@@ -133,7 +139,7 @@ public:
     LiveInstance(const ast::Instance& instance) :
         instance(instance) {}
     LiveInstance(const ast::Instance& instance, LiveValuePtr&& value) :
-        instance(instance), value(std::move(value)) {}
+        value(std::move(value)), instance(instance) {}
 
     const LiveValuePtr& get_value() const {
         return value;
