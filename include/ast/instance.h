@@ -5,6 +5,7 @@
 
 #include "ast/ast_object.h"
 #include "ast/value.h"
+#include "macros.h"
 
 namespace ast {
 
@@ -16,5 +17,7 @@ public:
     Instance(std::string&& name, const LangType& lang_type) :
         Value(lang_type), name(std::move(name)) {}
 };
+
+DEF_DERIVED_TYPES(Instance)
 
 }

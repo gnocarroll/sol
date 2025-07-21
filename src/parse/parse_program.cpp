@@ -2,7 +2,7 @@
 
 namespace parse {
 
-ast::Program parse_program(ast::ASTBuilder& ast_builder) {
+ast::Program parse_program(ast::AST& ast_builder) {
     ast::Scope global_scope;
     ast::CompoundStatement statements;
 

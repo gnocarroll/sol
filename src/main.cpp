@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    auto ast_builder = ast::ASTBuilder(
+    auto ast_builder = ast::AST(
         in_stream ? CharStream(*in_stream) : CharStream(std::cin)
     );
 

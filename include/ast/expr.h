@@ -38,7 +38,7 @@ public:
     const Operator op;
     const ExprPtr rhs;
 
-    BinaryExpr(ast::ASTBuilder& ast_builder, ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
+    BinaryExpr(ast::AST& ast_builder, ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
         lhs(std::move(_lhs)), op(op), rhs(std::move(_rhs)) {
         
         if (lhs->has_err() || rhs->has_err()) {
@@ -78,7 +78,7 @@ public:
     const Operator op;
     const ExprPtr sub_expr;
 
-    UnaryExpr(ast::ASTBuilder& ast_builder, Operator op, ExprPtr&& _sub_expr) :
+    UnaryExpr(ast::AST& ast_builder, Operator op, ExprPtr&& _sub_expr) :
         op(op), sub_expr(std::move(_sub_expr)) {
         if (sub_expr->has_err()) {
             set_err();

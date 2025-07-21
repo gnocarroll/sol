@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 
+#include "ast/expr.h"
+#include "ast/instance.h"
+#include "ast/statement.h"
 #include "char_stream.h"
 #include "file_pos.h"
 #include "lang_err.h"
@@ -16,16 +19,20 @@ struct ASTErr : public HasFilePos, public LangErr {
         HasFilePos(file_pos), LangErr(std::move(err_msg)) {}
 };
 
-class ASTBuilder : public ErrorRegistry<ASTErr> {
+class AST : public ErrorRegistry<ASTErr> {
 private:
     size_t cstream_lookback = 0;
 
+    ExprPtrVec exprs;
+    InstancePtrVec instances;
+    StatementPtrVec statements;
+
 public:
     class CStreamLookback {
-        ASTBuilder &ast_builder;
+        AST &ast_builder;
         size_t old;
 
-        CStreamLookback(ASTBuilder& ast_builder, size_t new_lookback) :
+        CStreamLookback(AST& ast_builder, size_t new_lookback) :
             ast_builder(ast_builder),
             old(ast_builder.cstream_lookback) {
             ast_builder.cstream_lookback = new_lookback;
@@ -35,12 +42,12 @@ public:
             ast_builder.cstream_lookback = old;
         }
 
-        friend class ASTBuilder;
+        friend class AST;
     };
 
     CharStream cstream;
 
-    ASTBuilder(CharStream &&cstream) :
+    AST(CharStream &&cstream) :
         cstream(std::move(cstream)) {}
 
     void register_error(std::string&& err_msg) {
@@ -62,6 +69,16 @@ public:
         );
 
         return ret;
+    }
+
+    void add_expr(ExprPtr&& expr) {
+        exprs.emplace_back(expr);
+    }
+    void add_statement(StatementPtr&& statement) {
+        statements.emplace_back(statement);
+    }
+    void add_instance(InstancePtr&& instance) {
+        instances.emplace_back(instance);
     }
 };
 
