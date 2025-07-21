@@ -7,12 +7,14 @@
 #include "test_token.h"
 #include "token.h"
 
-#define N_PRECEDENCE_LEVELS (3)
+#define N_PRECEDENCE_LEVELS (5)
 
 namespace parse {
 
 /// @brief Grouped by precedence, later => higher precedence
 static std::initializer_list<Operator> binary_ops[N_PRECEDENCE_LEVELS] = {
+    {Operator::OP_EQ, Operator::OP_NEQ},
+    {Operator::OP_LT, Operator::OP_GT, Operator::OP_LE, Operator::OP_GE},
     {Operator::OP_ADD, Operator::OP_SUB},
     {Operator::OP_MULT, Operator::OP_DIV, Operator::OP_MOD},
     {Operator::OP_POW}
@@ -20,7 +22,8 @@ static std::initializer_list<Operator> binary_ops[N_PRECEDENCE_LEVELS] = {
 
 static Operator unary_ops[] = {
     Operator::OP_ADD,
-    Operator::OP_SUB
+    Operator::OP_SUB,
+    Operator::OP_NOT
 };
 
 #define DECL_EXPR_PARSER(name) \
@@ -71,6 +74,7 @@ static ast::OptionalExprPtr _parse_binary_expr(
         }
 
         lhs = std::make_unique<ast::BinaryExpr>(
+            ast_builder,
             std::move(*lhs),
             *found_op,
             std::move(*rhs)
@@ -113,6 +117,7 @@ static ast::OptionalExprPtr parse_unary_expr(ast::ASTBuilder& ast_builder, ast::
 
     for (long long op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
         ret = std::make_unique<ast::UnaryExpr>(
+            ast_builder,
             op_vector[op_idx],
             std::move(*ret)
         );

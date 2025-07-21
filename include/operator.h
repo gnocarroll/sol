@@ -33,5 +33,6 @@ public:
         return value;
     }
 
+    std::optional<std::string_view> get_text() const;
     std::optional<TokenType> get_token_type() const;
 };

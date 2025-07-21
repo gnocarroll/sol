@@ -7,6 +7,7 @@
 #include <ostream>
 #include <string>
 
+#include "ast/ast_builder.h"
 #include "ast/ast_object.h"
 #include "ast/type.h"
 #include "file_pos.h"
@@ -37,7 +38,7 @@ public:
     const Operator op;
     const ExprPtr rhs;
 
-    BinaryExpr(ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
+    BinaryExpr(ast::ASTBuilder& ast_builder, ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
         lhs(std::move(_lhs)), op(op), rhs(std::move(_rhs)) {
         
         if (lhs->has_err() || rhs->has_err()) {
@@ -52,6 +53,20 @@ public:
         Value::set_lang_type(
             lhs_type.get_binary_op_ret_type(op)
         );
+
+        if (&get_lang_type() == &lang_err_type) {
+            auto optional_op_text = op.get_text();
+            auto op_text = optional_op_text ? *optional_op_text : std::string_view("ERR");
+
+            ast_builder.register_error(
+                std::string("binary operation not supported: ") +
+                std::string(lhs_type.get_name()) +
+                " " +
+                std::string(op_text) +
+                " " +
+                std::string(rhs_type.get_name())
+            );
+        }
     };
 
     DECL_EXPR_FUNCS
@@ -63,14 +78,29 @@ public:
     const Operator op;
     const ExprPtr sub_expr;
 
-    UnaryExpr(Operator op, ExprPtr&& _sub_expr) : op(op), sub_expr(std::move(_sub_expr)) {
+    UnaryExpr(ast::ASTBuilder& ast_builder, Operator op, ExprPtr&& _sub_expr) :
+        op(op), sub_expr(std::move(_sub_expr)) {
         if (sub_expr->has_err()) {
             set_err();
         }
 
-        Expr::set_lang_type(
-            sub_expr->get_lang_type().get_unary_op_ret_type(op)
+        const auto& sub_expr_type = sub_expr->get_lang_type();
+
+        Value::set_lang_type(
+            sub_expr_type.get_unary_op_ret_type(op)
         );
+
+        if (&get_lang_type() == &lang_err_type) {
+            auto optional_op_text = op.get_text();
+            auto op_text = optional_op_text ? *optional_op_text : std::string_view("ERR");
+
+            ast_builder.register_error(
+                std::string("unary operation not supported: ") +
+                std::string(op_text) +
+                " " +
+                std::string(sub_expr_type.get_name())
+            );
+        }
     }
 
     DECL_EXPR_FUNCS
