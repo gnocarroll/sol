@@ -21,6 +21,10 @@ ast::OptionalStatementPtr parse_statement(ast::ASTBuilder& ast_builder, ast::Sco
 }
 
 static ast::OptionalStatementPtr _parse_statement(ast::ASTBuilder& ast_builder, ast::Scope &scope) {
+    if (match_token(ast_builder.cstream, TokenType::TOK_END)) {
+        return {};
+    }
+    
     if (match_token(ast_builder.cstream, TokenType::TOK_PRINT)) {
         auto expr = parse_expr(ast_builder, scope);
 

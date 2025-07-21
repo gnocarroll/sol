@@ -2,6 +2,8 @@ TOK(TOK_NONE, "")
 
 TOK(TOK_PRINT, "PRINT")
 
+TOK(TOK_END, "end")
+
 TOK(TOK_PLUS, "+")
 TOK(TOK_HYPHEN, "-")
 
