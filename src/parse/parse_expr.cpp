@@ -165,7 +165,11 @@ static ast::OptionalExprPtr parse_integer_literal_expr(ast::ASTBuilder& ast_buil
 static ast::OptionalExprPtr parse_boolean_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope);
 
 static ast::OptionalExprPtr parse_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope) {
+    for (const auto& parse_func : {parse_integer_literal_expr, parse_boolean_literal_expr}) {
+        if (auto expr = parse_func(ast_builder, scope)) return expr;
+    }
 
+    return {};
 }
 
 static ast::OptionalExprPtr parse_integer_literal_expr(ast::ASTBuilder& ast_builder, ast::Scope& scope) {
