@@ -103,13 +103,13 @@ public:
     Statement& make_statement(Args&&... args) {
         return add_statement(std::make_unique<T>(std::forward<Args>(args)...));
     }
-    template <typename T, typename... Args>
+    template <typename... Args>
     Instance& make_instance(Args&&... args) {
-        return add_instance(std::make_unique<T>(std::forward<Args>(args)...));
+        return add_instance(std::make_unique<Instance>(std::forward<Args>(args)...));
     }
-    template <typename T, typename... Args>
-    Scope& make_instance(Args&&... args) {
-        return add_scope(std::make_unique<T>(std::forward<Args>(args)...));
+    template <typename... Args>
+    Scope& make_scope(Args&&... args) {
+        return add_scope(std::make_unique<Scope>(std::forward<Args>(args)...));
     }
 };
 

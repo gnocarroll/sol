@@ -4,96 +4,114 @@
 
 namespace parse {
 
-static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope &scope);
+static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope& scope);
 
-ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope &scope) {
-    auto ret = _parse_statement(ast, scope);
+ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope& scope) {
+	auto ret = _parse_statement(ast, scope);
 
-    if (!ret) return {};
+	if (!ret) return {};
 
-    if (!parse_one_plus_newlines(ast)) {
-        ast.register_error("expected at least one newline immediately following statement");
+	if (!parse_one_plus_newlines(ast)) {
+		ast.register_error("expected at least one newline immediately following statement");
+	}
 
-        return ast.make_w_pos<ast::ErrStatement>();
-    }
-
-    return ret;
+	return ret;
 }
 
 static ast::OptionalStatementRef parse_print_statement(ast::AST& ast, ast::Scope& scope) {
-    if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return;
-    
-    auto expr = parse_expr(ast, scope);
+	if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return;
 
-    // no expr, will just print newline
-    if (!expr) return ast.add_statement(std::make_unique<ast::PrintStatement>());
+	auto expr = parse_expr(ast, scope);
 
-    // create w/ expr
-    return ast.add_statement(std::make_unique<ast::PrintStatement>(*expr));
+	// no expr, will just print newline
+	if (!expr) return ast.add_statement(std::make_unique<ast::PrintStatement>());
+
+	// create w/ expr
+	return ast.make_statement<ast::PrintStatement>(*expr);
 }
 
-static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope &scope) {
-    if (auto print_stmt = parse_print_statement(ast, scope)) return print_stmt;
+static ast::OptionalStatementRef parse_end_create_statement_w_expr(
+	ast::AST& ast,
+	ast::Scope& scope,
+	const std::string& name
+);
 
-    auto n_chars = match_token(ast.cstream, TokenType::TOK_WORD);
+static ast::OptionalStatementRef parse_end_modify_statement(
+	ast::AST& ast,
+	ast::Scope& scope,
+	const std::string& name
+);
 
-    if (!n_chars) return {};
+static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope& scope) {
+	if (auto print_stmt = parse_print_statement(ast, scope)) return print_stmt;
 
-    std::string name = ast.cstream.last_n_as_str(*n_chars)->get_str();
+	auto n_chars = match_token(ast.cstream, TokenType::TOK_WORD);
 
-    if (match_token(ast.cstream, TokenType::TOK_COLON_EQUAL)) {
-        if (scope.get(name)) {
-            ast.register_error(std::string("variable already exists: ") + name);
+	if (!n_chars) return {};
 
-            return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
-        }
+	std::string name = ast.cstream.last_n_as_str(*n_chars)->get_str();
 
-        auto expr = parse_expr(ast, scope);
+	if (auto create_stmt = parse_end_create_statement_w_expr(ast, scope, name)) return create_stmt;
+	if (auto modify_stmt = parse_end_modify_statement(ast, scope, name)) return modify_stmt;
 
-        if (!expr) {
-            expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
-        }
+	ast.register_error("WORD should be followed by := or = to form statement");
 
-        scope.push(ast::Instance(
-            std::string(name),
-            (*expr)->get_lang_type()
-        ));
+	return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+}
 
-        return ast.make_statement<ast::CreateStatement>(
-            *scope.get(name),
-            std::move(*expr)
-        );
-    }
-    else if (match_token(ast.cstream, TokenType::TOK_EQUAL)) {
-        auto instance = scope.get(name);
+static ast::OptionalStatementRef parse_end_create_statement_w_expr(ast::AST& ast, ast::Scope& scope, const std::string& name) {
+	if (!match_token(ast.cstream, TokenType::TOK_COLON_EQUAL)) return {};
 
-        if (!instance) {
-            ast.register_error(std::string("variable name not recognized: ") + name);
+	if (scope.get(name)) {
+		ast.register_error(std::string("variable already exists: ") + name);
 
-            return ast.make_w_pos<ast::ErrStatement>();
-        }
+		return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+	}
 
-        auto expr = parse_expr(ast, scope);
+	auto expr = parse_expr(ast, scope);
 
-        if (!expr) {
-            ast.register_error(std::string("expected expression for use in modifying variable ") + name);
+	if (!expr) {
+		ast.register_error(std::string("expected expr to initialize variable"));
 
-            expr = ast.make_w_pos<ast::ErrExpr>();
-        }
+		expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+	}
 
-        return std::make_unique<ast::ModifyStatement>(
-            *instance,
-            std::move(*expr)
-        );
-    }
+	auto& instance = ast.make_instance(
+		std::string(name),
+		expr->get().get_lang_type()
+	);
 
-    if (scope.get(name)) return std::make_unique<ast::ErrStatement>();
+	scope.push(instance);
 
-    scope.push(ast::Instance(std::string(name)));
+	return ast.make_statement<ast::CreateStatement>(
+		instance,
+		*expr
+	);
+}
 
-    return std::make_unique<ast::CreateStatement>(
-        *scope.get(name)
-    );
+static ast::OptionalStatementRef parse_end_modify_statement(ast::AST& ast, ast::Scope& scope, const std::string& name) {
+	if (!match_token(ast.cstream, TokenType::TOK_EQUAL)) return {};
+
+	auto instance = scope.get(name);
+
+	if (!instance) {
+		ast.register_error(std::string("variable name not recognized: ") + name);
+
+		return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+	}
+
+	auto expr = parse_expr(ast, scope);
+
+	if (!expr) {
+		ast.register_error(std::string("expected expression for use in modifying variable ") + name);
+
+		expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+	}
+
+	return ast.make_statement<ast::ModifyStatement>(
+		*instance,
+		*expr
+	);
 }
 
 }
