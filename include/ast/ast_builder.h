@@ -23,9 +23,11 @@ class AST : public ErrorRegistry<ASTErr> {
 private:
     size_t cstream_lookback = 0;
 
+    // centralize ownership of AST objects in this AST class
     ExprPtrVec exprs;
     InstancePtrVec instances;
     StatementPtrVec statements;
+    ScopePtrVec scopes;
 
 public:
     class CStreamLookback {
@@ -85,6 +87,29 @@ public:
         instances.emplace_back(instance);
 
         return *instances.back().get();
+    }
+    Scope& add_scope(ScopePtr&& scope) {
+        scopes.emplace_back(scope);
+
+        return *scopes.back().get();
+    }
+
+    // make unique_ptr and add to internal vec in one step
+    template <typename T, typename... Args>
+    Expr& make_expr(Args&&... args) {
+        return add_expr(std::make_unique<T>(std::forward<Args>(args)...));
+    }
+    template <typename T, typename... Args>
+    Statement& make_statement(Args&&... args) {
+        return add_statement(std::make_unique<T>(std::forward<Args>(args)...));
+    }
+    template <typename T, typename... Args>
+    Instance& make_instance(Args&&... args) {
+        return add_instance(std::make_unique<T>(std::forward<Args>(args)...));
+    }
+    template <typename T, typename... Args>
+    Scope& make_instance(Args&&... args) {
+        return add_scope(std::make_unique<T>(std::forward<Args>(args)...));
     }
 };
 

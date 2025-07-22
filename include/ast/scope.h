@@ -7,6 +7,7 @@
 
 #include "ast/ast_object.h"
 #include "ast/instance.h"
+#include "macros.h"
 
 namespace ast {
 
@@ -31,5 +32,7 @@ public:
         return *instances.at(name);
     }
 };
+
+DEF_DERIVED_TYPES(Scope)
 
 }

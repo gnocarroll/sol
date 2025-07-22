@@ -4,9 +4,9 @@
 
 namespace parse {
 
-static ast::OptionalStatementPtr _parse_statement(ast::AST& ast, ast::Scope &scope);
+static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope &scope);
 
-ast::OptionalStatementPtr parse_statement(ast::AST& ast, ast::Scope &scope) {
+ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope &scope) {
     auto ret = _parse_statement(ast, scope);
 
     if (!ret) return {};
@@ -20,14 +20,20 @@ ast::OptionalStatementPtr parse_statement(ast::AST& ast, ast::Scope &scope) {
     return ret;
 }
 
-static ast::OptionalStatementPtr _parse_statement(ast::AST& ast, ast::Scope &scope) {
-    if (match_token(ast.cstream, TokenType::TOK_PRINT)) {
-        auto expr = parse_expr(ast, scope);
+static ast::OptionalStatementRef parse_print_statement(ast::AST& ast, ast::Scope& scope) {
+    if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return;
+    
+    auto expr = parse_expr(ast, scope);
 
-        if (!expr) return std::make_unique<ast::PrintStatement>();
+    // no expr, will just print newline
+    if (!expr) return ast.add_statement(std::make_unique<ast::PrintStatement>());
 
-        return std::make_unique<ast::PrintStatement>(std::move(*expr));
-    }
+    // create w/ expr
+    return ast.add_statement(std::make_unique<ast::PrintStatement>(*expr));
+}
+
+static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope &scope) {
+    if (auto print_stmt = parse_print_statement(ast, scope)) return print_stmt;
 
     auto n_chars = match_token(ast.cstream, TokenType::TOK_WORD);
 
@@ -39,13 +45,13 @@ static ast::OptionalStatementPtr _parse_statement(ast::AST& ast, ast::Scope &sco
         if (scope.get(name)) {
             ast.register_error(std::string("variable already exists: ") + name);
 
-            return ast.make_w_pos<ast::ErrStatement>();
+            return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
         }
 
         auto expr = parse_expr(ast, scope);
 
         if (!expr) {
-            expr = ast.make_w_pos<ast::ErrExpr>();
+            expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
         }
 
         scope.push(ast::Instance(
@@ -53,7 +59,7 @@ static ast::OptionalStatementPtr _parse_statement(ast::AST& ast, ast::Scope &sco
             (*expr)->get_lang_type()
         ));
 
-        return std::make_unique<ast::CreateStatement>(
+        return ast.make_statement<ast::CreateStatement>(
             *scope.get(name),
             std::move(*expr)
         );

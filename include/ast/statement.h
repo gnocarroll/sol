@@ -79,11 +79,11 @@ public:
 /// @brief create new instance of some type
 class CreateStatement final : public Statement {
     Instance& instance;
-    const Expr& expr;
+    OptionalExprRef expr;
 
 public:
     CreateStatement(Instance& instance) : instance(instance) {}
-    CreateStatement(Instance& instance, const Expr& expr) :
+    CreateStatement(Instance& instance, Expr& expr) :
         instance(instance), expr(expr) {}
     
     DECL_STATEMENT_FUNCS
@@ -92,21 +92,21 @@ public:
 /// @brief modify some instance of a type
 class ModifyStatement final : public Statement {
     Instance& instance;
-    const Expr& expr;
+    Expr& expr;
 
 public:
-    ModifyStatement(Instance &instance, const Expr& expr) :
+    ModifyStatement(Instance &instance, Expr& expr) :
         instance(instance), expr(expr) {}
 
     DECL_STATEMENT_FUNCS
 };
 
 class PrintStatement final : public Statement {
-    const Expr& expr;
+    const OptionalExprRef expr;
 
 public:
     PrintStatement() {}
-    PrintStatement(const Expr& expr) :
+    PrintStatement(Expr& expr) :
         expr(expr) {}
 
     DECL_STATEMENT_FUNCS
