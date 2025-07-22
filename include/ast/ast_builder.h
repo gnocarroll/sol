@@ -71,14 +71,20 @@ public:
         return ret;
     }
 
-    void add_expr(ExprPtr&& expr) {
+    Expr& add_expr(ExprPtr&& expr) {
         exprs.emplace_back(expr);
+
+        return *exprs.back().get();
     }
-    void add_statement(StatementPtr&& statement) {
+    Statement& add_statement(StatementPtr&& statement) {
         statements.emplace_back(statement);
+
+        return *statements.back().get();
     }
-    void add_instance(InstancePtr&& instance) {
+    Instance& add_instance(InstancePtr&& instance) {
         instances.emplace_back(instance);
+
+        return *instances.back().get();
     }
 };
 

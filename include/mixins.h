@@ -39,7 +39,7 @@ public:
     void set_err() {
         err = true;
     }
-    bool has_err() {
+    bool has_err() const {
         return err;
     }
 };
@@ -51,7 +51,7 @@ public:
     HasFilePos() {}
     HasFilePos(FilePos file_pos) : file_pos(file_pos) {}
 
-    FilePos get_file_pos() {
+    FilePos get_file_pos() const {
         return file_pos;
     }
     void set_file_pos(FilePos file_pos) {

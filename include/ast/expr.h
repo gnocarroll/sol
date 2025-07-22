@@ -34,19 +34,19 @@ DEF_DERIVED_TYPES(Expr)
 
 class BinaryExpr final : public Expr {
 public:
-    const ExprPtr lhs;
+    const Expr& lhs;
     const Operator op;
-    const ExprPtr rhs;
+    const Expr& rhs;
 
-    BinaryExpr(ast::AST& ast_builder, ExprPtr&& _lhs, Operator op, ExprPtr &&_rhs) :
-        lhs(std::move(_lhs)), op(op), rhs(std::move(_rhs)) {
+    BinaryExpr(ast::AST& ast_builder, const Expr& _lhs, Operator op, const Expr&&&_rhs) :
+        lhs(_lhs), op(op), rhs(_rhs) {
         
-        if (lhs->has_err() || rhs->has_err()) {
+        if (lhs.has_err() || rhs.has_err()) {
             set_err();
         }
 
-        const auto& lhs_type = lhs->get_lang_type();
-        const auto& rhs_type = rhs->get_lang_type();
+        const auto& lhs_type = lhs.get_lang_type();
+        const auto& rhs_type = rhs.get_lang_type();
 
         if (&lhs_type != &rhs_type) return;
 
@@ -76,15 +76,15 @@ class UnaryExpr final : public Expr {
 public:
 
     const Operator op;
-    const ExprPtr sub_expr;
+    const Expr& sub_expr;
 
-    UnaryExpr(ast::AST& ast_builder, Operator op, ExprPtr&& _sub_expr) :
-        op(op), sub_expr(std::move(_sub_expr)) {
-        if (sub_expr->has_err()) {
+    UnaryExpr(ast::AST& ast_builder, Operator op, const Expr& _sub_expr) :
+        op(op), sub_expr(_sub_expr) {
+        if (sub_expr.has_err()) {
             set_err();
         }
 
-        const auto& sub_expr_type = sub_expr->get_lang_type();
+        const auto& sub_expr_type = sub_expr.get_lang_type();
 
         Value::set_lang_type(
             sub_expr_type.get_unary_op_ret_type(op)
@@ -144,10 +144,10 @@ public:
 };
 
 class InstanceExpr final : public Expr {
-    Instance &instance;
+    const Instance &instance;
 
 public:
-    InstanceExpr(Instance &instance) : instance(instance) {
+    InstanceExpr(const Instance &instance) : instance(instance) {
         Value::set_lang_type(instance.get_lang_type());
     }
 

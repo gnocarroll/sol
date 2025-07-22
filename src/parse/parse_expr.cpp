@@ -27,18 +27,18 @@ static Operator unary_ops[] = {
 };
 
 #define DECL_EXPR_PARSER(name) \
-    static ast::OptionalExprPtr name (ast::AST&, ast::Scope&);
+    static ast::OptionalExprRef name (ast::AST&, ast::Scope&);
 
 DECL_EXPR_PARSER(parse_binary_expr)
 DECL_EXPR_PARSER(parse_unary_expr)
 DECL_EXPR_PARSER(parse_primary_expr)
 DECL_EXPR_PARSER(parse_literal_expr)
 
-ast::OptionalExprPtr parse_expr(ast::AST& ast, ast::Scope& scope) {
+ast::OptionalExprRef parse_expr(ast::AST& ast, ast::Scope& scope) {
     return parse_binary_expr(ast, scope);
 }
 
-static ast::OptionalExprPtr _parse_binary_expr(
+static ast::OptionalExprRef _parse_binary_expr(
     ast::AST& ast,
     ast::Scope& scope,
     size_t precedence_idx
@@ -49,7 +49,7 @@ static ast::OptionalExprPtr _parse_binary_expr(
         return _parse_binary_expr(ast, scope, precedence_idx + 1);
     };
 
-    ast::OptionalExprPtr lhs = parse_sub_expr();
+    auto lhs = parse_sub_expr();
 
     if (!lhs) return {};
 
@@ -65,30 +65,30 @@ static ast::OptionalExprPtr _parse_binary_expr(
 
         if (!found_op) break;
 
-        ast::OptionalExprPtr rhs = parse_sub_expr();
+        auto rhs = parse_sub_expr();
 
         if (!rhs) {
             ast.register_error("found no rhs for binary expr");
 
-            rhs = ast.make_w_pos<ast::ErrExpr>();
+            rhs = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
         }
 
-        lhs = std::make_unique<ast::BinaryExpr>(
+        lhs = ast.add_expr(std::make_unique<ast::BinaryExpr>(
             ast,
-            std::move(*lhs),
+            *lhs,
             *found_op,
-            std::move(*rhs)
-        );
+            *rhs
+        ));
     }
 
     return lhs;
 }
 
-static ast::OptionalExprPtr parse_binary_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_binary_expr(ast::AST& ast, ast::Scope& scope) {
     return _parse_binary_expr(ast, scope, 0);
 }
 
-static ast::OptionalExprPtr parse_unary_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_unary_expr(ast::AST& ast, ast::Scope& scope) {
     std::vector<Operator> op_vector;
     
     while (true) {
@@ -112,21 +112,21 @@ static ast::OptionalExprPtr parse_unary_expr(ast::AST& ast, ast::Scope& scope) {
     if (!ret) {
         ast.register_error("found operators but no operand for unary expr");
 
-        ret = ast.make_w_pos<ast::ErrExpr>();
+        ret = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
     }
 
     for (long long op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
-        ret = std::make_unique<ast::UnaryExpr>(
+        ret = ast.add_expr(std::make_unique<ast::UnaryExpr>(
             ast,
             op_vector[op_idx],
-            std::move(*ret)
-        );
+            *ret
+        ));
     }
 
     return ret;
 }
 
-static ast::OptionalExprPtr parse_primary_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_primary_expr(ast::AST& ast, ast::Scope& scope) {
     // ( expr )
 
     if (match_token(ast.cstream, TokenType::TOK_L_PAREN)) {
@@ -150,10 +150,10 @@ static ast::OptionalExprPtr parse_primary_expr(ast::AST& ast, ast::Scope& scope)
         if (!instance) {
             ast.register_error(std::string("unrecognized variable name: ") + name);
 
-            return ast.make_w_pos<ast::ErrExpr>();
+            return ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
         }
 
-        return ast.make_w_pos<ast::InstanceExpr>(*instance);
+        return ast.add_expr(ast.make_w_pos<ast::InstanceExpr>(*instance));
     }
 
     // literal
@@ -161,39 +161,39 @@ static ast::OptionalExprPtr parse_primary_expr(ast::AST& ast, ast::Scope& scope)
     return parse_literal_expr(ast, scope);
 }
 
-static ast::OptionalExprPtr parse_integer_literal_expr(ast::AST& ast, ast::Scope& scope);
-static ast::OptionalExprPtr parse_boolean_literal_expr(ast::AST& ast, ast::Scope& scope);
+static ast::OptionalExprRef parse_integer_literal_expr(ast::AST& ast, ast::Scope& scope);
+static ast::OptionalExprRef parse_boolean_literal_expr(ast::AST& ast, ast::Scope& scope);
 
-static ast::OptionalExprPtr parse_literal_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_literal_expr(ast::AST& ast, ast::Scope& scope) {
     for (const auto& parse_func : {parse_integer_literal_expr, parse_boolean_literal_expr}) {
-        if (auto expr = parse_func(ast, scope)) return expr;
+        if (const auto& expr = parse_func(ast, scope)) return expr;
     }
 
     return {};
 }
 
-static ast::OptionalExprPtr parse_integer_literal_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_integer_literal_expr(ast::AST& ast, ast::Scope& scope) {
     auto n_chars = match_token(ast.cstream, TokenType::TOK_INTEGER);
 
     if (!n_chars) return {};
 
     auto str = ast.cstream.last_n_as_str(*n_chars)->get_str();
 
-    return std::make_unique<ast::IntegerLiteralExpr>(std::strtoull(
+    return ast.add_expr(std::make_unique<ast::IntegerLiteralExpr>(std::strtoull(
         str.data(),
         nullptr,
         0 // make use of provided feature to autodetect base
-    ));
+    )));
 }
 
-static ast::OptionalExprPtr parse_boolean_literal_expr(ast::AST& ast, ast::Scope& scope) {
+static ast::OptionalExprRef parse_boolean_literal_expr(ast::AST& ast, ast::Scope& scope) {
     bool value;
     
     if (auto n_chars = match_token(ast.cstream, TokenType::TOK_TRUE)) value = true;
     else if (auto n_chars = match_token(ast.cstream, TokenType::TOK_FALSE)) value = false;
     else return {};
 
-    return std::make_unique<ast::BooleanLiteralExpr>(value);
+    return ast.add_expr(std::make_unique<ast::BooleanLiteralExpr>(value));
 }
 
 }

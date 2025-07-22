@@ -28,13 +28,13 @@ public:
 DEF_DERIVED_TYPES(Statement)
 
 class CompoundStatement : public Statement {
-    std::vector<std::unique_ptr<Statement> > statements;
+    std::vector<const Statement *> statements;
 
 public:
     CompoundStatement() {}
 
-    void push(std::unique_ptr<Statement> &&new_statement) {
-        statements.emplace_back(std::move(new_statement));
+    void push(const Statement& new_statement) {
+        statements.push_back(&new_statement);
 
         if (statements.back()->has_err()) {
             set_err();
@@ -79,12 +79,12 @@ public:
 /// @brief create new instance of some type
 class CreateStatement final : public Statement {
     Instance& instance;
-    OptionalExprPtr expr;
+    const Expr& expr;
 
 public:
     CreateStatement(Instance& instance) : instance(instance) {}
-    CreateStatement(Instance& instance, ExprPtr&& expr) :
-        instance(instance), expr(std::move(expr)) {}
+    CreateStatement(Instance& instance, const Expr& expr) :
+        instance(instance), expr(expr) {}
     
     DECL_STATEMENT_FUNCS
 };
@@ -92,22 +92,22 @@ public:
 /// @brief modify some instance of a type
 class ModifyStatement final : public Statement {
     Instance& instance;
-    ExprPtr expr;
+    const Expr& expr;
 
 public:
-    ModifyStatement(Instance &instance, ExprPtr&& expr) :
-        instance(instance), expr(std::move(expr)) {}
+    ModifyStatement(Instance &instance, const Expr& expr) :
+        instance(instance), expr(expr) {}
 
     DECL_STATEMENT_FUNCS
 };
 
 class PrintStatement final : public Statement {
-    OptionalExprPtr expr;
+    const Expr& expr;
 
 public:
     PrintStatement() {}
-    PrintStatement(ExprPtr &&expr) :
-        expr(std::move(expr)) {}
+    PrintStatement(const Expr& expr) :
+        expr(expr) {}
 
     DECL_STATEMENT_FUNCS
 };
