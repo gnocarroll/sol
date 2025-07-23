@@ -30,9 +30,6 @@
     <ClCompile Include="src\token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast\expr_eval.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ast\expr_print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\parse\parse_statement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ast\type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\keywords.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\treewalk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ast\ast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\treewalk\eval.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -83,10 +95,10 @@
     <ClInclude Include="include\token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\treewalk.h">
+    <ClInclude Include="include\treewalk\treewalk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ast\ast_builder.h">
+    <ClInclude Include="include\ast\ast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ast\ast_object.h">
@@ -107,5 +119,30 @@
     <ClInclude Include="include\ast\statement.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ast\type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ast\value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\keywords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\treewalk\eval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\treewalk\live_value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\treewalk\live_instance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="examples\bugged_prog.sol" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="resource\def_operators.txt" />
+    <Text Include="resource\def_tokens.txt" />
   </ItemGroup>
 </Project>

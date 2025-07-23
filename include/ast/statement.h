@@ -44,38 +44,6 @@ public:
     DECL_STATEMENT_FUNCS
 };
 
-class IfStatement : public Statement {
-public:
-    class ConditionAndBody {
-        ExprPtr condition;
-        CompoundStatement if_body;
-    };
-
-private:
-    std::vector<ConditionAndBody> if_thens;
-
-    std::optional<CompoundStatement> else_body;
-
-public:
-    IfStatement(
-        std::vector<ConditionAndBody>&& if_thens,
-        std::optional<CompoundStatement>&& else_body
-    ) : if_thens(std::move(if_thens)), else_body(std::move(else_body)) {}
-
-    DECL_STATEMENT_FUNCS
-};
-
-class WhileStatement : public Statement {
-    ExprPtr condition;
-    CompoundStatement while_body;
-
-public:
-    WhileStatement(ExprPtr&& condition, CompoundStatement&& while_body) :
-        condition(std::move(condition)), while_body(std::move(while_body)) {}
-
-    DECL_STATEMENT_FUNCS
-};
-
 /// @brief create new instance of some type
 class CreateStatement final : public Statement {
     Instance& instance;

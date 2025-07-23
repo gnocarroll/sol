@@ -22,10 +22,10 @@ private:
 public:
     Operator(OperatorEnum value) : value(value) {}
 
-    bool operator==(const Operator& other) {
+    bool operator==(const Operator& other) const {
         return value == other.value;
     }
-    bool operator==(OperatorEnum value) {
+    bool operator==(OperatorEnum value) const {
         return this->value == value;
     }
 

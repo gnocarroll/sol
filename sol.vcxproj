@@ -126,7 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ast\expr_eval.cpp" />
+    <ClCompile Include="src\ast\ast.cpp" />
     <ClCompile Include="src\ast\expr_print.cpp" />
     <ClCompile Include="src\ast\statement_execute.cpp" />
     <ClCompile Include="src\ast\type.cpp" />
@@ -141,9 +141,10 @@
     <ClCompile Include="src\test_token.cpp" />
     <ClCompile Include="src\token.cpp" />
     <ClCompile Include="src\treewalk.cpp" />
+    <ClCompile Include="src\treewalk\eval.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ast\ast_builder.h" />
+    <ClInclude Include="include\ast\ast.h" />
     <ClInclude Include="include\ast\ast_object.h" />
     <ClInclude Include="include\ast\expr.h" />
     <ClInclude Include="include\ast\instance.h" />
@@ -163,7 +164,10 @@
     <ClInclude Include="include\string_line_pair.h" />
     <ClInclude Include="include\test_token.h" />
     <ClInclude Include="include\token.h" />
-    <ClInclude Include="include\treewalk.h" />
+    <ClInclude Include="include\treewalk\eval.h" />
+    <ClInclude Include="include\treewalk\live_instance.h" />
+    <ClInclude Include="include\treewalk\live_value.h" />
+    <ClInclude Include="include\treewalk\treewalk.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resource\def_operators.txt" />

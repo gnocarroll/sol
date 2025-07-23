@@ -1,6 +1,6 @@
-#include "ast/expr.h"
+#include "treewalk/eval.h"
 
-namespace ast {
+namespace treewalk {
 
 treewalk::LiveValuePtr BinaryExpr::eval(treewalk::ExecutionContext& ctx) const {
     auto lhs_val = lhs->eval(ctx);
