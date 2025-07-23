@@ -37,6 +37,9 @@ private:
 	};
 	Expr* _rhs = nullptr;
 public:
+	ExprType expr_type() const {
+		return _expr_type;
+	}
 	const LangType& lang_type() const {
 		return *_lang_type;
 	}

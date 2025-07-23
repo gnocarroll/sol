@@ -5,5 +5,5 @@
 #include "treewalk/treewalk.h"
 
 namespace treewalk {
-	LiveValuePtr eval(treewalk::ExecutionContext& ctx, ast::Expr& expr);
+	LiveValuePtr eval(treewalk::ExecutionContext& ctx, const ast::Expr& expr);
 }
