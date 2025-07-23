@@ -5,11 +5,12 @@
 namespace treewalk {
 
 #define DECL_EVAL(expr_type) \
-    static LiveValuePtr eval_ ## expr_type (ExecutionContext& ctx, const ast::Expr& expr);
+    static LiveValuePtr eval_ ## expr_type ## _expr (ExecutionContext& ctx, const ast::Expr& expr);
 
-DECL_EVAL(binary_expr)
-DECL_EVAL(unary_expr)
-DECL_EVAL(literal_expr)
+DECL_EVAL(binary)
+DECL_EVAL(unary)
+DECL_EVAL(literal)
+DECL_EVAL(instance)
 
 LiveValuePtr eval(ExecutionContext& ctx, const ast::Expr& expr) {
     switch (expr.expr_type()) {
@@ -19,6 +20,10 @@ LiveValuePtr eval(ExecutionContext& ctx, const ast::Expr& expr) {
         return eval_unary_expr(ctx, expr);
     case ast::Expr::Literal:
         return eval_literal_expr(ctx, expr);
+    case ast::Expr::Instance:
+        return eval_instance_expr(ctx, expr);
+    default:
+        break;
     }
 
     ctx.register_error(expr, "expression type invalid");
@@ -111,10 +116,22 @@ static LiveValuePtr eval_literal_expr(ExecutionContext& ctx, const ast::Expr& ex
 }
 
 static LiveValuePtr eval_instance_expr(ExecutionContext& ctx, const ast::Expr& expr) {
-    if (instance.has_err() ||
-        !ctx.live_instance_exists(instance.name)) return LiveErrValue::create();
+    auto instance = expr.instance();
 
-    return (*ctx.get_live_instance(instance.name)).get().get_value()->clone_ptr();
+    if (!instance) {
+        ctx.register_error(expr, "unable to retrieve instance from instance expr");
+        return LiveErrValue::create();
+    }
+
+    if (!ctx.live_instance_exists((**instance).name)) {
+        ctx.register_error(
+            expr,
+            std::string("unable to find already created instance with name ") + (**instance).name
+        );
+        return LiveErrValue::create();
+    }
+
+    return (*ctx.get_live_instance((**instance).name)).get().get_value()->clone_ptr();
 }
 
 }

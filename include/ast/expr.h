@@ -7,6 +7,7 @@
 #include <optional>
 
 #include "ast/ast_object.h"
+#include "ast/instance.h"
 #include "ast/type.h"
 #include "ast/value.h"
 #include "macros.h"
@@ -20,7 +21,8 @@ public:
 		Err = 0,
 		Binary,
 		Unary,
-		Literal
+		Literal,
+		Instance,
 	};
 
 private:
@@ -28,6 +30,8 @@ private:
 	ExprType _expr_type = ExprType::Err;
 
 	int64_t _value = 0;
+
+	ast::Instance* _instance = nullptr;
 
 	Operator _op = Operator::OP_NONE;
 
@@ -68,6 +72,11 @@ public:
 		if (_expr_type != Literal) return {};
 
 		return _value;
+	}
+	std::optional<ast::Instance*> instance() const {
+		if (!_instance || _expr_type != Instance) return {};
+
+		return _instance;
 	}
 };
 
