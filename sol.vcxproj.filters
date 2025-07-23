@@ -137,6 +137,9 @@
     <ClInclude Include="include\treewalk\live_instance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\treewalk\execute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="examples\bugged_prog.sol" />

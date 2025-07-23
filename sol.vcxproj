@@ -165,6 +165,7 @@
     <ClInclude Include="include\test_token.h" />
     <ClInclude Include="include\token.h" />
     <ClInclude Include="include\treewalk\eval.h" />
+    <ClInclude Include="include\treewalk\execute.h" />
     <ClInclude Include="include\treewalk\live_instance.h" />
     <ClInclude Include="include\treewalk\live_value.h" />
     <ClInclude Include="include\treewalk\treewalk.h" />
