@@ -1,32 +1,89 @@
 #include "ast/ast.h"
 
 namespace ast {
-	Expr& AST::make_binary_expr(Expr& lhs, Operator op, Expr& rhs) {
 
+Expr& AST::expr_factory() {
+	exprs.emplace_back(std::make_unique<Expr>());
+
+	return *exprs.back().get();
+}
+
+Expr& AST::make_binary_expr(Expr& lhs, Operator op, Expr& rhs) {
+	Expr& ret = expr_factory();
+
+	ret._expr_type = Expr::Binary;
+
+	ret._lhs = &lhs;
+	ret._op = op;
+	ret._rhs = &rhs;
+
+	const auto& lhs_type = lhs.lang_type();
+	const auto& rhs_type = rhs.lang_type();
+
+	if (&lhs_type != &rhs_type) {
+		register_error("lhs and rhs of binary expr are of different types");
+	
+		return ret;
 	}
-	Expr& AST::make_unary_expr(Operator op, Expr& sub_expr) {
 
+	ret._lang_type = &lhs_type.get_binary_op_ret_type(op);
+
+	if (ret._lang_type == &ast::lang_err_type) {
+		std::string_view op_text;
+
+		auto maybe_op_text = op.get_text();
+
+		op_text = maybe_op_text ? *maybe_op_text : "ERR";
+		
+		register_error(
+			std::string("binary expr not supported: ") +
+			std::string(lhs_type.get_name()) + " " +
+			std::string(op_text) + " " +
+			std::string(rhs_type.get_name())
+		);
 	}
-	Expr& AST::make_literal_expr(const LangType& lang_type, int64_t value) {
+	
+	return ret;
+}
 
+Expr& AST::make_unary_expr(Operator op, Expr& sub_expr) {
+	Expr& ret = expr_factory();
+
+	ret._expr_type = Expr::Unary;
+
+	ret._op = op;
+	ret._sub_expr = &sub_expr;
+
+	const auto& sub_expr_type = sub_expr.get_lang_type();
+
+	ret._lang_type = &sub_expr_type.get_unary_op_ret_type(op);
+
+	if (ret._lang_type == &ast::lang_err_type) {
+		std::string_view op_text;
+
+		auto maybe_op_text = op.get_text();
+
+		op_text = maybe_op_text ? *maybe_op_text : "ERR";
+
+		register_error(
+			std::string("unary expr not supported: ") +
+			std::string(op_text) + " " +
+			std::string(sub_expr_type.get_name())
+		);
 	}
 
-	Expr(AST& ast, Expr& lhs, Operator op, Expr& rhs) :
-		_expr_type(Binary), _lhs(&lhs), _op(op), _rhs(&rhs) {
+	return ret;
+}
 
-		const auto& lhs_type = lhs.lang_type();
-		const auto& rhs_type = rhs.lang_type();
+Expr& AST::make_literal_expr(const LangType& lang_type, int64_t value) {
+	Expr& ret = expr_factory();
+	
+	ret._expr_type = Expr::Literal;
+	
+	ret._lang_type = &lang_type;
+	ret._value = value;
 
-		if (&lhs_type != &rhs_type) return;
+	return ret;
+}
 
-		_lang_type = &lhs_type.get_binary_op_ret_type(op);
-	}
-	Expr(AST& ast, Operator op, Expr& sub_expr) :
-		_expr_type(Unary), _op(op), _sub_expr(&sub_expr) {
-
-		_lang_type = &sub_expr.get_lang_type().get_unary_op_ret_type(op);
-	}
-	Expr(AST& ast, const LangType& lang_type, int64_t value) :
-		_lang_type(&lang_type), _value(value) {
-	}
 }

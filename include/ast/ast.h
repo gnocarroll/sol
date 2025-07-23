@@ -5,6 +5,7 @@
 
 #include "ast/expr.h"
 #include "ast/instance.h"
+#include "ast/scope.h"
 #include "ast/statement.h"
 #include "char_stream.h"
 #include "file_pos.h"
@@ -20,9 +21,6 @@ struct ASTErr : public HasFilePos, public LangErr {
 };
 
 class AST : public ErrorRegistry<ASTErr> {
-public:
-    friend struct Expr;
-
 private:
     size_t cstream_lookback = 0;
 

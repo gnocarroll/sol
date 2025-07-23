@@ -16,7 +16,6 @@
 namespace ast {
 
 struct Expr : public ASTObject, public Value {
-public:
 	enum ExprType {
 		Err = 0,
 		Binary,
@@ -25,7 +24,6 @@ public:
 		Instance,
 	};
 
-private:
 	const LangType* _lang_type = &lang_err_type;
 	ExprType _expr_type = ExprType::Err;
 
@@ -40,7 +38,7 @@ private:
 		Expr* _sub_expr;
 	};
 	Expr* _rhs = nullptr;
-public:
+
 	ExprType expr_type() const {
 		return _expr_type;
 	}
