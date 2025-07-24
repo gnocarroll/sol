@@ -1,34 +1,68 @@
 #include "ast/statement.h"
+#include "treewalk/eval.h"
+#include "treewalk/execute.h"
+
+#include <iostream>
 
 namespace treewalk {
 
+#define DECL_EXECUTOR(name) \
+    static void execute_ ## name ## _statement(ExecutionContext& ctx, ast::Statement& statement);
 
+DECL_EXECUTOR(compound)
+DECL_EXECUTOR(create)
+DECL_EXECUTOR(modify)
+DECL_EXECUTOR(print)
 
-void CompoundStatement::execute(treewalk::ExecutionContext& ctx) {
-    for (auto& statement : statements) {
-        statement->execute(ctx);
+void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
+#define STATEMENT_CASE(TypePrefix, lowercase) \
+    if (auto* lowercase ## _statement = dynamic_cast<ast:: TypePrefix ## Statement *>(&statement)) { \
+        execute_ ## lowercase ## _statement(ctx, * lowercase ## _statement ); \
+        return; \
+    }
+
+    STATEMENT_CASE(Compound, compound)
+    STATEMENT_CASE(Create, create)
+    STATEMENT_CASE(Modify, modify)
+    STATEMENT_CASE(Print, print)
+
+    ctx.register_error(
+        statement,
+        "unable to recognize which statement type (e.g. compound statement) and execute"
+    );
+}
+
+static void execute_compound_statement(ExecutionContext& ctx, ast::CompoundStatement& statement) {
+    for (auto& statement : statement.statements()) {
+        execute_statement(ctx, *statement);
 
         if (ctx.n_errs() > 0) return;
     }
 }
 
-void IfStatement::execute(treewalk::ExecutionContext& ctx) {    
-    if (if_thens.size() == 0)
+static void execute_create_statement(ExecutionContext& ctx, ast::CreateStatement& statement) {
+    auto maybe_instance = statement.instance();
 
-    for (auto& if_then : if_thens) {
-        (void) if_then;
+    if (!maybe_instance) {
+        ctx.register_error(statement, "found no instance associated with create statement");
+        return;
     }
-}
 
-void CreateStatement::execute(treewalk::ExecutionContext& ctx) {
-    if (instance.has_err()) return;
+    auto instance = *maybe_instance;
+    
+    if (instance->has_err()) {
+        ctx.register_error(statement, "error in contained instance");
+        return;
+    }
 
-    if (!expr) {
+    auto maybe_expr = statement.expr();
+
+    if (!maybe_expr) {
         ctx.add_live_instance(instance);
         return;
     }
 
-    auto val = (*expr)->eval(ctx);
+    auto val = eval(ctx, **maybe_expr);
 
     ctx.add_live_instance(
         instance,
@@ -36,45 +70,61 @@ void CreateStatement::execute(treewalk::ExecutionContext& ctx) {
     );
 }
 
-void ModifyStatement::execute(treewalk::ExecutionContext& ctx) {
-    if (instance.has_err()) return;
+static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement& statement) {
+    auto instance = statement.instance();
+    
+    if (!instance || (**instance).has_err()) {
+        ctx.register_error(statement, "modify statement does not contain valid instance");
+        return;
+    }
 
-    auto optional_live_instance = ctx.get_live_instance(instance.name);
+    auto optional_live_instance = ctx.get_live_instance((**instance).name);
 
     if (!optional_live_instance) {
         ctx.register_error(
-            *this,
+            statement,
             "attempted to run modify statement with unrecognized instance"
         );
         return;
     }
 
-    treewalk::LiveInstance& live_instance = *optional_live_instance;
+    LiveInstance& live_instance = *optional_live_instance;
 
-    auto val = expr->eval(ctx);
+    auto expr = statement.expr();
+
+    if (!expr || (**expr).has_err()) {
+        ctx.register_error(
+            statement,
+            "expr is invalid"
+        );
+        return;
+    }
+
+    auto val = eval(ctx, **expr);
 
     live_instance.set_value(std::move(val));
 }
 
-void PrintStatement::execute(treewalk::ExecutionContext& ctx) {
+static void execute_print_statement(ExecutionContext& ctx, ast::PrintStatement& statement) {
+    auto expr = statement.expr();
+    
     if (!expr) {
         std::cout << '\n';
         return;
     }
 
-    auto val = (*expr)->eval(ctx);
+    auto val = eval(ctx, **expr);
 
     std::cout << val->to_string() << '\n';
 
     return;
 }
 
-void ErrStatement::execute(treewalk::ExecutionContext& ctx) {
+static void execute_err_statement(ExecutionContext& ctx, ast::ErrStatement& statement) {
     ctx.register_error(
-        *this,
+        statement,
         "attempted to execute statement which was not correctly compiled"
     );
-    return;
 }
 
 }
