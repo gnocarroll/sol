@@ -65,11 +65,21 @@ public:
 
 private:
     Expr& expr_factory();
+
+    template <typename T>
+    Statement& statement_factory() {
+        statements.emplace_back(std::make_unique<T>());
+    }
 public:
 
     Expr& make_binary_expr(Expr& lhs, Operator op, Expr& rhs);
     Expr& make_unary_expr(Operator op, Expr& rhs);
     Expr& make_literal_expr(const LangType& lang_type, int64_t value);
+    
+    Statement& make_compound_statement(std::vector<Statement*>&& statements);
+    Statement& make_create_statement(Instance& instance, Expr& expr);
+    Statement& make_modify_statement(Instance& instance, Expr& expr);
+    Statement& make_print_statement(std::optional<Expr*> expr = {});
 };
 
 }
