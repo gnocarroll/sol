@@ -16,6 +16,8 @@
 namespace ast {
 
 struct Expr : public ASTObject, public Value {
+	Expr(Expr& other) = delete;
+	
 	enum ExprType {
 		Err = 0,
 		Binary,
@@ -24,7 +26,6 @@ struct Expr : public ASTObject, public Value {
 		Instance,
 	};
 
-	const LangType* _lang_type = &lang_err_type;
 	ExprType _expr_type = ExprType::Err;
 
 	int64_t _value = 0;
@@ -42,9 +43,7 @@ struct Expr : public ASTObject, public Value {
 	ExprType expr_type() const {
 		return _expr_type;
 	}
-	const LangType& lang_type() const {
-		return *_lang_type;
-	}
+
 	std::optional<Operator> op() const {
 		if (_expr_type != Unary && _expr_type != Binary) return {};
 		if (_op == Operator::OP_NONE) return {};

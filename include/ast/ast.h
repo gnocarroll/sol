@@ -5,6 +5,7 @@
 
 #include "ast/expr.h"
 #include "ast/instance.h"
+#include "ast/program.h"
 #include "ast/scope.h"
 #include "ast/statement.h"
 #include "char_stream.h"
@@ -25,6 +26,9 @@ private:
     size_t cstream_lookback = 0;
 
     // centralize ownership of AST objects in this AST class
+
+    bool returned_program = false;
+    Program program;
     ExprPtrVec exprs;
     InstancePtrVec instances;
     StatementPtrVec statements;
@@ -64,22 +68,35 @@ public:
     }
 
 private:
+    Instance& instance_factory();
     Expr& expr_factory();
 
     template <typename T>
-    Statement& statement_factory() {
+    T& statement_factory() {
         statements.emplace_back(std::make_unique<T>());
+
+        return *dynamic_cast<T*>(&statements.back());
     }
 public:
+    Instance& make_instance(std::string&& name, const ast::LangType& lang_type = ast::lang_err_type);
 
     Expr& make_binary_expr(Expr& lhs, Operator op, Expr& rhs);
     Expr& make_unary_expr(Operator op, Expr& rhs);
     Expr& make_literal_expr(const LangType& lang_type, int64_t value);
+    Expr& make_instance_expr(Instance& instance);
+    Expr& make_err_expr();
     
     Statement& make_compound_statement(std::vector<Statement*>&& statements);
     Statement& make_create_statement(Instance& instance, Expr& expr);
     Statement& make_modify_statement(Instance& instance, Expr& expr);
     Statement& make_print_statement(std::optional<Expr*> expr = {});
+    Statement& make_err_statement();
+
+    Program& make_program() {
+        returned_program = false;
+
+        return program;
+    }
 };
 
 }

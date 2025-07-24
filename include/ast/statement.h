@@ -16,6 +16,8 @@ namespace ast {
 struct Statement : public ASTObject {
 
     virtual ~Statement() {}
+
+    Statement(Statement& other) = delete;
 };
 
 DEF_DERIVED_TYPES(Statement)

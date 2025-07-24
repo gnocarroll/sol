@@ -70,15 +70,14 @@ static ast::OptionalExprRef _parse_binary_expr(
         if (!rhs) {
             ast.register_error("found no rhs for binary expr");
 
-            rhs = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+            rhs = ast.make_err_expr();
         }
 
-        lhs = ast.add_expr(std::make_unique<ast::BinaryExpr>(
-            ast,
+        lhs = ast.make_binary_expr(
             *lhs,
             *found_op,
             *rhs
-        ));
+        );
     }
 
     return lhs;
@@ -112,15 +111,14 @@ static ast::OptionalExprRef parse_unary_expr(ast::AST& ast, ast::Scope& scope) {
     if (!ret) {
         ast.register_error("found operators but no operand for unary expr");
 
-        ret = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+        ret = ast.make_err_expr();
     }
 
     for (long long op_idx = op_vector.size() - 1; op_idx >= 0; op_idx--) {
-        ret = ast.add_expr(std::make_unique<ast::UnaryExpr>(
-            ast,
+        ret = ast.make_unary_expr(
             op_vector[op_idx],
             *ret
-        ));
+        );
     }
 
     return ret;
@@ -150,10 +148,10 @@ static ast::OptionalExprRef parse_primary_expr(ast::AST& ast, ast::Scope& scope)
         if (!instance) {
             ast.register_error(std::string("unrecognized variable name: ") + name);
 
-            return ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+            return ast.make_err_expr();
         }
 
-        return ast.add_expr(ast.make_w_pos<ast::InstanceExpr>(*instance));
+        return ast.make_instance_expr(*instance);
     }
 
     // literal
@@ -179,11 +177,14 @@ static ast::OptionalExprRef parse_integer_literal_expr(ast::AST& ast, ast::Scope
 
     auto str = ast.cstream.last_n_as_str(*n_chars)->get_str();
 
-    return ast.add_expr(std::make_unique<ast::IntegerLiteralExpr>(std::strtoull(
-        str.data(),
-        nullptr,
-        0 // make use of provided feature to autodetect base
-    )));
+    return ast.make_literal_expr(
+        ast::lang_integer,
+        std::strtoull(
+            str.data(),
+            nullptr,
+            10
+        )
+    );
 }
 
 static ast::OptionalExprRef parse_boolean_literal_expr(ast::AST& ast, ast::Scope& scope) {
@@ -193,7 +194,10 @@ static ast::OptionalExprRef parse_boolean_literal_expr(ast::AST& ast, ast::Scope
     else if (auto n_chars = match_token(ast.cstream, TokenType::TOK_FALSE)) value = false;
     else return {};
 
-    return ast.add_expr(std::make_unique<ast::BooleanLiteralExpr>(value));
+    return ast.make_literal_expr(
+        ast::lang_bool,
+        (int64_t)value
+    );
 }
 
 }

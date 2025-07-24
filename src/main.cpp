@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "ast/ast_builder.h"
+#include "ast/ast.h"
 #include "char_stream.h"
 #include "parse.h"
 #include "ast/value.h"
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         in_stream ? CharStream(*in_stream) : CharStream(std::cin)
     );
 
-    auto program = parse::parse_program(ast_builder);
+    auto& program = parse::parse_program(ast_builder);
 
     if (ast_builder.n_errs() > 0) {
         for (const auto& err : ast_builder.get_errs()) {

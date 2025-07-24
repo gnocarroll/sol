@@ -2,6 +2,24 @@
 
 namespace ast {
 
+Instance& AST::instance_factory() {
+	instances.emplace_back(std::unique_ptr<Instance>());
+
+	return *instances.back().get();
+}
+
+Instance& AST::make_instance(
+	std::string&& name,
+	const ast::LangType& lang_type = ast::lang_err_type
+) {
+	Instance& ret = instance_factory();
+
+	ret._name = std::move(name);
+	ret.set_lang_type(lang_type);
+
+	return ret;
+}
+
 Expr& AST::expr_factory() {
 	exprs.emplace_back(std::make_unique<Expr>());
 
@@ -26,9 +44,9 @@ Expr& AST::make_binary_expr(Expr& lhs, Operator op, Expr& rhs) {
 		return ret;
 	}
 
-	ret._lang_type = &lhs_type.get_binary_op_ret_type(op);
+	ret.set_lang_type(lhs_type.get_binary_op_ret_type(op));
 
-	if (ret._lang_type == &ast::lang_err_type) {
+	if (&ret.lang_type() == &ast::lang_err_type) {
 		std::string_view op_text;
 
 		auto maybe_op_text = op.get_text();
@@ -54,11 +72,11 @@ Expr& AST::make_unary_expr(Operator op, Expr& sub_expr) {
 	ret._op = op;
 	ret._sub_expr = &sub_expr;
 
-	const auto& sub_expr_type = sub_expr.get_lang_type();
+	const auto& sub_expr_type = sub_expr.lang_type();
 
-	ret._lang_type = &sub_expr_type.get_unary_op_ret_type(op);
+	ret.set_lang_type(sub_expr_type.get_unary_op_ret_type(op));
 
-	if (ret._lang_type == &ast::lang_err_type) {
+	if (&ret.lang_type() == &ast::lang_err_type) {
 		std::string_view op_text;
 
 		auto maybe_op_text = op.get_text();
@@ -80,8 +98,69 @@ Expr& AST::make_literal_expr(const LangType& lang_type, int64_t value) {
 	
 	ret._expr_type = Expr::Literal;
 	
-	ret._lang_type = &lang_type;
+	ret.set_lang_type(lang_type);
 	ret._value = value;
+
+	return ret;
+}
+
+Expr& AST::make_instance_expr(Instance& instance) {
+	Expr& ret = expr_factory();
+
+	ret._expr_type = Expr::Instance;
+
+	ret._instance = &instance;
+	ret.set_lang_type(instance.lang_type());
+
+	return ret;
+}
+
+Expr& AST::make_err_expr() {
+	Expr& ret = expr_factory();
+
+	ret.set_file_pos(cstream.get_file_pos());
+
+	return ret;
+}
+
+Statement& AST::make_compound_statement(std::vector<Statement*>&& statements) {
+	auto& ret = statement_factory<CompoundStatement>();
+
+	ret._statements = std::move(statements);
+
+	return ret;
+}
+
+Statement& AST::make_create_statement(Instance& instance, Expr& expr) {
+	auto& ret = statement_factory<CreateStatement>();
+
+	ret._instance = &instance;
+	ret._expr = &expr;
+
+	return ret;
+}
+
+Statement& AST::make_modify_statement(Instance& instance, Expr& expr) {
+	auto& ret = statement_factory<ModifyStatement>();
+
+	ret._instance = &instance;
+	ret._expr = &expr;
+
+	return ret;
+}
+
+Statement& AST::make_print_statement(std::optional<Expr*> expr = {}) {
+	auto& ret = statement_factory<PrintStatement>();
+
+	ret._expr = expr;
+
+	return ret;
+}
+
+Statement& AST::make_err_statement() {
+	auto& ret = statement_factory<ErrStatement>();
+
+	ret.set_file_pos(cstream.get_file_pos());
 
 	return ret;
 }

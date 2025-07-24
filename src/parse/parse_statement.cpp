@@ -18,16 +18,30 @@ ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope& scope) {
 	return ret;
 }
 
+ast::Statement& parse_compound_statement(ast::AST& ast, ast::Scope& scope) {
+	std::vector<ast::Statement*> statements;
+
+	while (true) {
+		auto maybe_statement = parse_statement(ast, scope);
+
+		if (!maybe_statement || ast.n_errs() > 0) break;
+
+		statements.push_back(&maybe_statement->get());
+	}
+
+	return ast.make_compound_statement(std::move(statements));
+}
+
 static ast::OptionalStatementRef parse_print_statement(ast::AST& ast, ast::Scope& scope) {
 	if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return;
 
 	auto expr = parse_expr(ast, scope);
 
 	// no expr, will just print newline
-	if (!expr) return ast.add_statement(std::make_unique<ast::PrintStatement>());
+	if (!expr) return ast.make_print_statement();
 
 	// create w/ expr
-	return ast.make_statement<ast::PrintStatement>(*expr);
+	return ast.make_print_statement(&expr->get());
 }
 
 static ast::OptionalStatementRef parse_end_create_statement_w_expr(
@@ -56,7 +70,7 @@ static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope& sco
 
 	ast.register_error("WORD should be followed by := or = to form statement");
 
-	return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+	return ast.make_err_statement();
 }
 
 static ast::OptionalStatementRef parse_end_create_statement_w_expr(ast::AST& ast, ast::Scope& scope, const std::string& name) {
@@ -65,7 +79,7 @@ static ast::OptionalStatementRef parse_end_create_statement_w_expr(ast::AST& ast
 	if (scope.get(name)) {
 		ast.register_error(std::string("variable already exists: ") + name);
 
-		return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+		return ast.make_err_statement();
 	}
 
 	auto expr = parse_expr(ast, scope);
@@ -73,17 +87,17 @@ static ast::OptionalStatementRef parse_end_create_statement_w_expr(ast::AST& ast
 	if (!expr) {
 		ast.register_error(std::string("expected expr to initialize variable"));
 
-		expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+		expr = ast.make_err_expr();
 	}
 
 	auto& instance = ast.make_instance(
 		std::string(name),
-		expr->get().get_lang_type()
+		expr->get().lang_type()
 	);
 
 	scope.push(instance);
 
-	return ast.make_statement<ast::CreateStatement>(
+	return ast.make_create_statement(
 		instance,
 		*expr
 	);
@@ -97,7 +111,7 @@ static ast::OptionalStatementRef parse_end_modify_statement(ast::AST& ast, ast::
 	if (!instance) {
 		ast.register_error(std::string("variable name not recognized: ") + name);
 
-		return ast.add_statement(ast.make_w_pos<ast::ErrStatement>());
+		return ast.make_err_statement();
 	}
 
 	auto expr = parse_expr(ast, scope);
@@ -105,10 +119,10 @@ static ast::OptionalStatementRef parse_end_modify_statement(ast::AST& ast, ast::
 	if (!expr) {
 		ast.register_error(std::string("expected expression for use in modifying variable ") + name);
 
-		expr = ast.add_expr(ast.make_w_pos<ast::ErrExpr>());
+		expr = ast.make_err_expr();
 	}
 
-	return ast.make_statement<ast::ModifyStatement>(
+	return ast.make_modify_statement(
 		*instance,
 		*expr
 	);

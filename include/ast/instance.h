@@ -9,13 +9,10 @@
 
 namespace ast {
 
-class Instance : public ASTObject, public Value {
-public:
-    const std::string name;
+struct Instance : public ASTObject, public Value {
+    std::string _name;
 
-    Instance(std::string&& name) : name(std::move(name)) {}
-    Instance(std::string&& name, const LangType& lang_type) :
-        Value(lang_type), name(std::move(name)) {}
+    Instance(Instance& other) = delete;
 };
 
 DEF_DERIVED_TYPES(Instance)
