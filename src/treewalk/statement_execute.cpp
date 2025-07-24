@@ -1,6 +1,8 @@
 #include "ast/statement.h"
 
-namespace ast {
+namespace treewalk {
+
+
 
 void CompoundStatement::execute(treewalk::ExecutionContext& ctx) {
     for (auto& statement : statements) {

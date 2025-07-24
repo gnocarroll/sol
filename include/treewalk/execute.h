@@ -4,5 +4,5 @@
 #include "treewalk/treewalk.h"
 
 namespace treewalk {
-	void execute(ExecutionContext& ctx, ast::Statement& statement);
+	void execute_statement(ExecutionContext& ctx, ast::Statement& statement);
 }

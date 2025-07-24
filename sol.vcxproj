@@ -128,7 +128,7 @@
   <ItemGroup>
     <ClCompile Include="src\ast\ast.cpp" />
     <ClCompile Include="src\ast\expr_print.cpp" />
-    <ClCompile Include="src\ast\statement_execute.cpp" />
+    <ClCompile Include="src\treewalk\statement_execute.cpp" />
     <ClCompile Include="src\ast\type.cpp" />
     <ClCompile Include="src\char_stream.cpp" />
     <ClCompile Include="src\keywords.cpp" />

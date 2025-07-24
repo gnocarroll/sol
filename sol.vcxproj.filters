@@ -33,7 +33,7 @@
     <ClCompile Include="src\ast\expr_print.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast\statement_execute.cpp">
+    <ClCompile Include="src\treewalk\statement_execute.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\parse\parse_expr.cpp">
