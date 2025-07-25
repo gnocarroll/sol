@@ -3,13 +3,13 @@
 namespace ast {
 
 Instance& AST::instance_factory() {
-	instances.emplace_back(std::unique_ptr<Instance>());
+	instances.emplace_back(std::make_unique<Instance>());
 
 	return *instances.back().get();
 }
 
 Scope& AST::scope_factory() {
-	scopes.emplace_back(std::unique_ptr<Scope>());
+	scopes.emplace_back(std::make_unique<Scope>());
 
 	return *scopes.back().get();
 }

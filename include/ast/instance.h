@@ -14,6 +14,7 @@ namespace ast {
 struct Instance : public ASTObject, public Value {
     std::string _name;
 
+    Instance() {}
     Instance(Instance& other) = delete;
 
     const std::string& name() const {
