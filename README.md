@@ -12,9 +12,6 @@ a scanner then a parser then type checking etc.
 Currently you can write extremely basic programs, and a signed integer and
 boolean type are supported. You can do basic operations and print out results.
 
-Unfortunately need to iron out some bugs right now before working on any
-more functionality.
-
 e.g.
 
 ```
