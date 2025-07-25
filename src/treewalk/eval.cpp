@@ -36,14 +36,14 @@ static LiveValuePtr eval_binary_expr(ExecutionContext& ctx, const ast::Expr& exp
     auto rhs = expr.rhs();
 
     if (!lhs || !rhs) {
-        ctx.register_error("binary expr missing subexpr");
+        ctx.register_error(expr, "binary expr missing subexpr");
         return LiveErrValue::create();
     }
 
     auto op = expr.op();
 
     if (!op) {
-        ctx.register_error("binary expr missing op");
+        ctx.register_error(expr, "binary expr missing op");
         return LiveErrValue::create();
     }
     
@@ -69,11 +69,11 @@ static LiveValuePtr eval_unary_expr(ExecutionContext& ctx, const ast::Expr& expr
     auto op = expr.op();
 
     if (!sub_expr) {
-        ctx.register_error("unary expression missing sub_expr");
+        ctx.register_error(expr, "unary expression missing sub_expr");
         return LiveErrValue::create();
     }
     if (!op) {
-        ctx.register_error("unary expression missing op");
+        ctx.register_error(expr, "unary expression missing op");
         return LiveErrValue::create();
     }
     
@@ -104,10 +104,10 @@ static LiveValuePtr eval_literal_expr(ExecutionContext& ctx, const ast::Expr& ex
     const auto& lang_type = expr.lang_type();
 
     if (&lang_type == &ast::lang_integer) {
-        return std::make_unique<LiveIntegerValue>(value);
+        return std::make_unique<LiveIntegerValue>(*value);
     }
     else if (&lang_type == &ast::lang_bool) {
-        return std::make_unique<LiveBooleanValue>(value);
+        return std::make_unique<LiveBooleanValue>(*value);
     }
 
     ctx.register_error(expr, "invalid lang type in expr");
@@ -123,15 +123,15 @@ static LiveValuePtr eval_instance_expr(ExecutionContext& ctx, const ast::Expr& e
         return LiveErrValue::create();
     }
 
-    if (!ctx.live_instance_exists((**instance).name)) {
+    if (!ctx.live_instance_exists((**instance).name())) {
         ctx.register_error(
             expr,
-            std::string("unable to find already created instance with name ") + (**instance).name
+            std::string("unable to find already created instance with name ") + (**instance).name()
         );
         return LiveErrValue::create();
     }
 
-    return (*ctx.get_live_instance((**instance).name)).get().get_value()->clone_ptr();
+    return (*ctx.get_live_instance((**instance).name())).get().get_value()->clone_ptr();
 }
 
 }

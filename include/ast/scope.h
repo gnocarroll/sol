@@ -18,7 +18,7 @@ public:
     Scope() {}
 
     void push(Instance &instance) {
-        std::string key = instance.name;
+        std::string key = instance.name();
 
         instances.emplace(std::make_pair(
             std::move(key),

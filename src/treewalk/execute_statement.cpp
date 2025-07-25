@@ -6,13 +6,13 @@
 
 namespace treewalk {
 
-#define DECL_EXECUTOR(name) \
-    static void execute_ ## name ## _statement(ExecutionContext& ctx, ast::Statement& statement);
+#define DECL_EXECUTOR(TypePrefix, name) \
+    static void execute_ ## name ## _statement(ExecutionContext& ctx, ast:: TypePrefix ## Statement & statement);
 
-DECL_EXECUTOR(compound)
-DECL_EXECUTOR(create)
-DECL_EXECUTOR(modify)
-DECL_EXECUTOR(print)
+DECL_EXECUTOR(Compound, compound)
+DECL_EXECUTOR(Create, create)
+DECL_EXECUTOR(Modify, modify)
+DECL_EXECUTOR(Print, print)
 
 void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
 #define STATEMENT_CASE(TypePrefix, lowercase) \
@@ -58,14 +58,14 @@ static void execute_create_statement(ExecutionContext& ctx, ast::CreateStatement
     auto maybe_expr = statement.expr();
 
     if (!maybe_expr) {
-        ctx.add_live_instance(instance);
+        ctx.register_error(statement, "expected expression in create statement");
         return;
     }
 
     auto val = eval(ctx, **maybe_expr);
 
     ctx.add_live_instance(
-        instance,
+        *instance,
         std::move(val)
     );
 }
@@ -78,7 +78,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
         return;
     }
 
-    auto optional_live_instance = ctx.get_live_instance((**instance).name);
+    auto optional_live_instance = ctx.get_live_instance((**instance).name());
 
     if (!optional_live_instance) {
         ctx.register_error(

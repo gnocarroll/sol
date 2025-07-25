@@ -16,6 +16,7 @@
 namespace ast {
 
 struct Expr : public ASTObject, public Value {
+	Expr() {}
 	Expr(Expr& other) = delete;
 	
 	enum ExprType {

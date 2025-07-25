@@ -16,7 +16,7 @@ Scope& AST::scope_factory() {
 
 Instance& AST::make_instance(
 	std::string&& name,
-	const ast::LangType& lang_type = ast::lang_err_type
+	const ast::LangType& lang_type
 ) {
 	Instance& ret = instance_factory();
 
@@ -161,7 +161,7 @@ Statement& AST::make_modify_statement(Instance& instance, Expr& expr) {
 	return ret;
 }
 
-Statement& AST::make_print_statement(std::optional<Expr*> expr = {}) {
+Statement& AST::make_print_statement(std::optional<Expr*> expr) {
 	auto& ret = statement_factory<PrintStatement>();
 
 	ret._expr = expr;

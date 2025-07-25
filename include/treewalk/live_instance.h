@@ -11,6 +11,7 @@ class LiveInstance : public HasErrFlag {
 public:
     const ast::Instance& instance;
 
+    LiveInstance(LiveInstance& other) = delete;
     LiveInstance(const ast::Instance& instance) :
         instance(instance) {
     }

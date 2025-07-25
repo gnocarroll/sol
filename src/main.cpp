@@ -6,6 +6,8 @@
 #include "char_stream.h"
 #include "parse.h"
 #include "ast/value.h"
+#include "treewalk/treewalk.h"
+#include "treewalk/execute.h"
 
 std::string_view usage("sol [optional: filepath]");
 
@@ -45,10 +47,12 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    program.execute();
+    treewalk::ExecutionContext ctx;
 
-    if (program.ctx.n_errs() > 0) {
-        for (const auto& err : program.ctx.get_errs()) {
+    treewalk::execute_program(ctx, program);
+
+    if (ctx.n_errs() > 0) {
+        for (const auto& err : ctx.get_errs()) {
             std::cerr << err.get_err_msg();
             std::cerr << '\n';
         }

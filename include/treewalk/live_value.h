@@ -14,6 +14,7 @@ class LiveValue {
     const ast::LangType& lang_type;
 
 public:
+    LiveValue(LiveValue& other) = delete;
     LiveValue(const ast::LangType& lang_type) : lang_type(lang_type) {}
     virtual ~LiveValue() {}
 

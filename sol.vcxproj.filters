@@ -30,9 +30,6 @@
     <ClCompile Include="src\token.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ast\expr_print.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\treewalk\execute_statement.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

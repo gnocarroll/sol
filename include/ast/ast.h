@@ -75,7 +75,7 @@ private:
     T& statement_factory() {
         statements.emplace_back(std::make_unique<T>());
 
-        return *dynamic_cast<T*>(&statements.back());
+        return *dynamic_cast<T*>(statements.back().get());
     }
 
     Program& program_factory();

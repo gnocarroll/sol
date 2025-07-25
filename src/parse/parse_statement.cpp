@@ -37,7 +37,7 @@ ast::Statement& parse_compound_statement(ast::AST& ast, ast::Scope& scope) {
 }
 
 static ast::OptionalStatementRef parse_print_statement(ast::AST& ast, ast::Scope& scope) {
-	if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return;
+	if (!match_token(ast.cstream, TokenType::TOK_PRINT)) return {};
 
 	auto expr = parse_expr(ast, scope);
 

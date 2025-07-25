@@ -1,4 +1,4 @@
-#include "treewalk.h"
+#include "treewalk/treewalk.h"
 
 #include <cmath>
 
