@@ -2,30 +2,16 @@
 
 namespace parse {
 
-void parse_program(ast::AST& ast_builder) {
-    ast::Scope global_scope;
-    ast::CompoundStatement statements;
+ast::Program& parse_program(ast::AST& ast) {
+    auto& global_scope = ast.make_scope();
 
-    parse_zero_plus_newlines(ast_builder);
+    auto& compound_statement = parse_compound_statement(ast, global_scope);
 
-    while (true) {
-        auto statement = parse_statement(ast_builder, global_scope);
-
-        if (!statement) break;
-
-        statements.push(std::move(*statement));
+    if (ast.cstream.peekc()) {
+        ast.register_error("chars remaining in input stream");
     }
 
-    parse_zero_plus_newlines(ast_builder);
-
-    if (ast_builder.cstream.peekc()) {
-        ast_builder.register_error("failed to parse statement");
-    }
-
-    return ast::Program(
-        std::move(global_scope),
-        std::move(statements)
-    );
+    return ast.make_program(global_scope, compound_statement);
 }
 
 }

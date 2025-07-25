@@ -20,6 +20,8 @@ ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope& scope) {
 
 ast::Statement& parse_compound_statement(ast::AST& ast, ast::Scope& scope) {
 	std::vector<ast::Statement*> statements;
+	
+	parse_zero_plus_newlines(ast);
 
 	while (true) {
 		auto maybe_statement = parse_statement(ast, scope);
@@ -28,6 +30,8 @@ ast::Statement& parse_compound_statement(ast::AST& ast, ast::Scope& scope) {
 
 		statements.push_back(&maybe_statement->get());
 	}
+
+	parse_zero_plus_newlines(ast);
 
 	return ast.make_compound_statement(std::move(statements));
 }

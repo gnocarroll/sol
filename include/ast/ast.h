@@ -27,8 +27,7 @@ private:
 
     // centralize ownership of AST objects in this AST class
 
-    bool returned_program = false;
-    Program program;
+    ProgramPtrVec programs;
     ExprPtrVec exprs;
     InstancePtrVec instances;
     StatementPtrVec statements;
@@ -69,6 +68,7 @@ public:
 
 private:
     Instance& instance_factory();
+    Scope& scope_factory();
     Expr& expr_factory();
 
     template <typename T>
@@ -77,6 +77,8 @@ private:
 
         return *dynamic_cast<T*>(&statements.back());
     }
+
+    Program& program_factory();
 public:
     Instance& make_instance(std::string&& name, const ast::LangType& lang_type = ast::lang_err_type);
 
@@ -92,11 +94,9 @@ public:
     Statement& make_print_statement(std::optional<Expr*> expr = {});
     Statement& make_err_statement();
 
-    Program& make_program() {
-        returned_program = false;
+    Scope& make_scope();
 
-        return program;
-    }
+    Program& make_program(Scope& global_scope, Statement& entry_point);
 };
 
 }

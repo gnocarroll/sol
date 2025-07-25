@@ -14,7 +14,7 @@
 namespace ast {
 
 struct Statement : public ASTObject {
-
+    Statement() {}
     virtual ~Statement() {}
 
     Statement(Statement& other) = delete;

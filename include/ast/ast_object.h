@@ -4,7 +4,8 @@
 
 namespace ast {
 
-class ASTObject : public HasFilePos, public HasErrFlag {
+struct ASTObject : public HasFilePos, public HasErrFlag {
+	ASTObject() {}
 	ASTObject(ASTObject& other) = delete;
 };
 

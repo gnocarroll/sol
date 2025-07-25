@@ -8,6 +8,12 @@ Instance& AST::instance_factory() {
 	return *instances.back().get();
 }
 
+Scope& AST::scope_factory() {
+	scopes.emplace_back(std::unique_ptr<Scope>());
+
+	return *scopes.back().get();
+}
+
 Instance& AST::make_instance(
 	std::string&& name,
 	const ast::LangType& lang_type = ast::lang_err_type
@@ -24,6 +30,12 @@ Expr& AST::expr_factory() {
 	exprs.emplace_back(std::make_unique<Expr>());
 
 	return *exprs.back().get();
+}
+
+Program& AST::program_factory() {
+	programs.emplace_back(std::make_unique<Program>());
+
+	return *programs.back().get();
 }
 
 Expr& AST::make_binary_expr(Expr& lhs, Operator op, Expr& rhs) {
@@ -161,6 +173,19 @@ Statement& AST::make_err_statement() {
 	auto& ret = statement_factory<ErrStatement>();
 
 	ret.set_file_pos(cstream.get_file_pos());
+
+	return ret;
+}
+
+Scope& AST::make_scope() {
+	return scope_factory();
+}
+
+Program& AST::make_program(Scope& global_scope, Statement& statement) {
+	auto& ret = program_factory();
+
+	ret._global_scope = &global_scope;
+	ret._entry_point = &statement;
 
 	return ret;
 }
