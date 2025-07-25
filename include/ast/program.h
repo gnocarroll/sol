@@ -1,30 +1,29 @@
 #pragma once
 
-#include "treewalk.h"
 #include "ast/ast_object.h"
 #include "ast/scope.h"
 #include "ast/statement.h"
+#include "macros.h"
 
 namespace ast {
 
-class Program : public ASTObject {
-    Scope global_scope;
-    CompoundStatement statements;
+struct Program : public ASTObject {
+    Scope* _global_scope;
+    Statement* _entry_point;
 
-public:
-    treewalk::ExecutionContext ctx;
+    std::optional<Scope*> global_scope() {
+        if (!_global_scope) return {};
 
-    Program(Scope&& global_scope, CompoundStatement&& statements) :
-        global_scope(global_scope), statements(std::move(statements)) {
-
-        if (global_scope.has_err() || statements.has_err()) {
-            set_err();
-        }
+        return _global_scope;
     }
 
-    void execute() {
-        return statements.execute(ctx);
+    std::optional<Statement*> entry_point() {
+        if (!_entry_point) return {};
+
+        return _entry_point;
     }
 };
+
+DEF_DERIVED_TYPES(Program)
 
 }

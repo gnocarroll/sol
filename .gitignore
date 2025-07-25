@@ -11,7 +11,9 @@ obj
 
 # Visual Studio
 
+sol
 .vs
+x64
 
 # Visual Studio Code
 

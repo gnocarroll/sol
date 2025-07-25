@@ -2,6 +2,8 @@
 
 #include <cctype>
 
+#include "keywords.h"
+
 #define DECL_SPECIAL_MATCHER(name) \
     static std::optional<size_t> name (CharStream &cstream);
 
@@ -77,6 +79,8 @@ static std::optional<size_t> match_integer(CharStream &cstream) {
 }
 
 static std::optional<size_t> match_word(CharStream &cstream) {
+    auto checkpoint = cstream.scoped_checkpoint();
+
     size_t n_chars = 0;
 
     auto first_c = cstream.peekc();
@@ -98,6 +102,15 @@ static std::optional<size_t> match_word(CharStream &cstream) {
 
         n_chars++;
     }
+
+    std::string word = cstream.last_n_as_str(n_chars)->get_str();
+
+    // ensure word is not a language keyword
+    for (const auto& kw : keywords) {
+        if (word == kw) return {};
+    }
+
+    checkpoint.disable();
 
     return n_chars;
 }

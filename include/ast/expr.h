@@ -1,114 +1,83 @@
 #pragma once
 
+#include <cstdint>
 #include <expected>
-#include <iostream>
+#include <functional>
 #include <memory>
 #include <optional>
-#include <ostream>
-#include <string>
 
 #include "ast/ast_object.h"
-#include "file_pos.h"
-#include "instance.h"
+#include "ast/instance.h"
+#include "ast/type.h"
+#include "ast/value.h"
 #include "macros.h"
 #include "operator.h"
-#include "treewalk.h"
 
 namespace ast {
 
-class Expr : public ASTObject {
-public:
+struct Expr : public ASTObject, public Value {
+	Expr() {}
+	Expr(Expr& other) = delete;
+	
+	enum ExprType {
+		Err = 0,
+		Binary,
+		Unary,
+		Literal,
+		Instance,
+	};
 
-    virtual ~Expr() {};
+	ExprType _expr_type = ExprType::Err;
 
-    virtual void print(std::ostream& ostream = std::cout) = 0;
-    virtual std::optional<long> eval(treewalk::ExecutionContext& ctx) = 0;
+	int64_t _value = 0;
+
+	ast::Instance* _instance = nullptr;
+
+	Operator _op = Operator::OP_NONE;
+
+	union {
+		Expr* _lhs = nullptr;
+		Expr* _sub_expr;
+	};
+	Expr* _rhs = nullptr;
+
+	ExprType expr_type() const {
+		return _expr_type;
+	}
+
+	std::optional<Operator> op() const {
+		if (_expr_type != Unary && _expr_type != Binary) return {};
+		if (_op == Operator::OP_NONE) return {};
+
+		return _op;
+	}
+	std::optional<Expr*> lhs() const {
+		if (!_lhs || _expr_type != Binary) return {};
+
+		return _lhs;
+	}
+	std::optional<Expr*> rhs() const {
+		if (!_rhs || _expr_type != Binary) return {};
+
+		return _rhs;
+	}
+	std::optional<Expr*> sub_expr() const {
+		if (!_sub_expr || _expr_type != Unary) return {};
+
+		return _sub_expr;
+	}
+	std::optional<int64_t> value() const {
+		if (_expr_type != Literal) return {};
+
+		return _value;
+	}
+	std::optional<ast::Instance*> instance() const {
+		if (!_instance || _expr_type != Instance) return {};
+
+		return _instance;
+	}
 };
 
-#define DECL_EXPR_FUNCS \
-    void print(std::ostream& ostream = std::cout); \
-    std::optional<long> eval(treewalk::ExecutionContext& ctx);
-
-DEF_PTR_TYPES(Expr)
-
-class BinaryExpr final : public Expr {
-public:
-    const ExprPtr lhs;
-    const Operator op;
-    const ExprPtr rhs;
-
-    BinaryExpr(ExprPtr&& lhs, Operator op, ExprPtr &&rhs) :
-        lhs(std::move(lhs)), op(op), rhs(std::move(rhs)) {
-        
-        if (this->lhs->has_err() || this->rhs->has_err()) {
-            set_err();
-        }
-    };
-
-    DECL_EXPR_FUNCS
-};
-
-class UnaryExpr final : public Expr {
-public:
-
-    const Operator op;
-    const ExprPtr sub_expr;
-
-    UnaryExpr(Operator op, ExprPtr&& sub_expr) : op(op), sub_expr(std::move(sub_expr)) {
-        if (this->sub_expr->has_err()) {
-            set_err();
-        }
-    }
-
-    DECL_EXPR_FUNCS
-};
-
-class LiteralExpr : public Expr {
-public:
-    virtual ~LiteralExpr() {};
-};
-
-class IntegerLiteralExpr final : public LiteralExpr {
-public:
-    const long value;
-
-    IntegerLiteralExpr(long value) : value(value) {}
-
-    void print(std::ostream &ostream = std::cout) {
-        ostream << value;
-    }
-    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
-        return value;
-    }
-};
-
-class InstanceExpr final : public Expr {
-    Instance &instance;
-
-public:
-    InstanceExpr(Instance &instance) : instance(instance) {}
-
-    DECL_EXPR_FUNCS
-};
-
-class ErrExpr final : public Expr {
-public:
-    ErrExpr() {
-        set_err();
-    }
-
-    void print(std::ostream &ostream = std::cout) {
-        ostream << "ERR";
-    }
-    std::optional<long> eval(treewalk::ExecutionContext& ctx) {
-        ctx.register_error(
-            *this,
-            "attempted to execute expression which could not be compiled/constructed correctly"
-        );
-        return {};
-    }
-};
-
-#undef DECL_EXPR_FUNCS
+DEF_DERIVED_TYPES(Expr)
 
 }

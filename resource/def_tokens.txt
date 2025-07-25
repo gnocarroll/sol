@@ -2,6 +2,8 @@ TOK(TOK_NONE, "")
 
 TOK(TOK_PRINT, "PRINT")
 
+TOK(TOK_END, "end")
+
 TOK(TOK_PLUS, "+")
 TOK(TOK_HYPHEN, "-")
 
@@ -16,6 +18,19 @@ TOK(TOK_R_PAREN, ")")
 
 TOK(TOK_EQUAL, "=")
 TOK(TOK_COLON_EQUAL, ":=")
+
+TOK(TOK_TRUE, "true")
+TOK(TOK_FALSE, "false")
+TOK(TOK_NOT, "not")
+
+TOK(TOK_LT, "<")
+TOK(TOK_LE, "<=")
+
+TOK(TOK_GT, ">")
+TOK(TOK_GE, ">=")
+
+TOK(TOK_EQUAL_EQUAL, "==")
+TOK(TOK_EXCL_EQUAL, "!=")
 
 TOK(TOK_NEWLINE, "\n")
 

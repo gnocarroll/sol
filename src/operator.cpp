@@ -23,3 +23,11 @@ std::optional<TokenType> Operator::get_token_type() const {
 
     return ret;
 }
+
+std::optional<std::string_view> Operator::get_text() const {
+    auto ttype = get_token_type();
+
+    if (!ttype) return {};
+
+    return ttype->get_text();
+}

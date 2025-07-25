@@ -7,118 +7,64 @@
 
 #include "ast/ast_object.h"
 #include "ast/expr.h"
-#include "file_pos.h"
 #include "instance.h"
 #include "macros.h"
 #include "mixins.h"
-#include "treewalk.h"
 
 namespace ast {
 
-class Statement : public ASTObject {
-public:
+struct Statement : public ASTObject {
+    Statement() {}
     virtual ~Statement() {}
 
-    virtual void execute(treewalk::ExecutionContext& ctx) = 0;
+    Statement(Statement& other) = delete;
 };
 
-#define DECL_STATEMENT_FUNCS \
-    void execute(treewalk::ExecutionContext& ctx);
+DEF_DERIVED_TYPES(Statement)
 
-DEF_PTR_TYPES(Statement)
+struct CompoundStatement : public Statement {
+    std::vector<Statement *> _statements;
 
-class CompoundStatement : public Statement {
-    std::vector<std::unique_ptr<Statement> > statements;
+    std::vector<Statement*>& statements() {
+        return _statements;
+    }
+};
 
-public:
-    CompoundStatement() {}
+struct InstanceStatement : public Statement {
+    Instance* _instance = nullptr;
+    Expr* _expr = nullptr;
 
-    void push(std::unique_ptr<Statement> &&new_statement) {
-        statements.emplace_back(std::move(new_statement));
+    std::optional<Instance*> instance() {
+        if (!_instance) return{};
 
-        if (statements.back()->has_err()) {
-            set_err();
-        }
+        return _instance;
     }
 
-    DECL_STATEMENT_FUNCS
-};
+    std::optional<Expr*> expr() {
+        if (!_expr) return {};
 
-class IfStatement : public Statement {
-public:
-    class ConditionAndBody {
-        ExprPtr condition;
-        CompoundStatement if_body;
-    };
-
-private:
-    std::vector<ConditionAndBody> if_thens;
-
-    std::optional<CompoundStatement> else_body;
-
-public:
-    IfStatement(
-        std::vector<ConditionAndBody>&& if_thens,
-        std::optional<CompoundStatement>&& else_body
-    ) : if_thens(std::move(if_thens)), else_body(std::move(else_body)) {}
-
-    DECL_STATEMENT_FUNCS
-};
-
-class WhileStatement : public Statement {
-    ExprPtr condition;
-    CompoundStatement while_body;
-
-public:
-    WhileStatement(ExprPtr&& condition, CompoundStatement&& while_body) :
-        condition(std::move(condition)), while_body(std::move(while_body)) {}
-
-    DECL_STATEMENT_FUNCS
+        return _expr;
+    }
 };
 
 /// @brief create new instance of some type
-class CreateStatement final : public Statement {
-    Instance& instance;
-    OptionalExprPtr expr;
-
-public:
-    CreateStatement(Instance& instance) : instance(instance) {}
-    CreateStatement(Instance& instance, ExprPtr&& expr) :
-        instance(instance), expr(std::move(expr)) {}
-    
-    DECL_STATEMENT_FUNCS
-};
+struct CreateStatement final : public InstanceStatement {};
 
 /// @brief modify some instance of a type
-class ModifyStatement final : public Statement {
-    Instance& instance;
-    ExprPtr expr;
+struct ModifyStatement final : public InstanceStatement {};
 
-public:
-    ModifyStatement(Instance &instance, ExprPtr&& expr) :
-        instance(instance), expr(std::move(expr)) {}
+struct PrintStatement final : public Statement {
+    std::optional<Expr*> _expr;
 
-    DECL_STATEMENT_FUNCS
+    std::optional<Expr*> expr() {
+        return _expr;
+    }
 };
 
-class PrintStatement final : public Statement {
-    OptionalExprPtr expr;
-
-public:
-    PrintStatement() {}
-    PrintStatement(ExprPtr &&expr) :
-        expr(std::move(expr)) {}
-
-    DECL_STATEMENT_FUNCS
-};
-
-class ErrStatement final : public Statement {
-public:
+struct ErrStatement final : public Statement {
     ErrStatement() {
         set_err();
     }
-
-    DECL_STATEMENT_FUNCS
 };
 
 #undef DECL_STATEMENT_FUNCS
