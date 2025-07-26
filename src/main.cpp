@@ -6,7 +6,7 @@
 #include "char_stream.h"
 #include "parse.h"
 #include "ast/value.h"
-#include "treewalk/treewalk.h"
+#include "treewalk/execution_context.h"
 #include "treewalk/execute.h"
 
 std::string_view usage("sol [optional: filepath]");

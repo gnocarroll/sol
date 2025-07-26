@@ -14,7 +14,6 @@
 #include "macros.h"
 #include "mixins.h"
 #include "treewalk/live_instance.h"
-#include "treewalk/live_scope.h"
 
 namespace treewalk {
 
@@ -30,17 +29,15 @@ public:
 
 class ExecutionContext : public ErrorRegistry<ExecutionErr> {
     LiveInstancePtrVec live_instances;
-    LiveScopePtrVec live_scopes;
 
-    LiveScope& scope_factory() {
-        live_scopes.emplace_back(std::make_unique<LiveScope>());
+    LiveInstance& live_instance_factory();
 
-        return *live_scopes.back().get();
-    }
+    std::unordered_map<ast::Instance*, LiveInstance*> instance_map;
 
 public:
+    LiveInstance& make_live_instance(ast::Instance& instance, LiveValuePtr&& value);
 
-
+    std::optional<LiveInstance*> get_live_instance(ast::Instance& instance);
 };
 
 }

@@ -78,7 +78,7 @@ static void execute_create_statement(ExecutionContext& ctx, ast::CreateStatement
 
     auto val = eval(ctx, **maybe_expr);
 
-    ctx.add_live_instance(
+    ctx.make_live_instance(
         *instance,
         std::move(val)
     );
@@ -92,7 +92,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
         return;
     }
 
-    auto optional_live_instance = ctx.get_live_instance((**instance).name());
+    auto optional_live_instance = ctx.get_live_instance(**instance);
 
     if (!optional_live_instance) {
         ctx.register_error(
@@ -102,7 +102,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
         return;
     }
 
-    LiveInstance& live_instance = *optional_live_instance;
+    auto live_instance = *optional_live_instance;
 
     auto expr = statement.expr();
 
@@ -116,7 +116,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
 
     auto val = eval(ctx, **expr);
 
-    live_instance.set_value(std::move(val));
+    live_instance->set_value(std::move(val));
 }
 
 static void execute_print_statement(ExecutionContext& ctx, ast::PrintStatement& statement) {

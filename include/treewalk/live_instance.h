@@ -6,17 +6,13 @@
 
 namespace treewalk {
 
-class LiveInstance : public HasErrFlag {
+struct LiveInstance : public HasErrFlag {
     LiveValuePtr value = LiveErrValue::create();
-public:
-    const ast::Instance& instance;
+    
+    const ast::Instance* _instance = nullptr;
 
-    LiveInstance(LiveInstance& other) = delete;
-    LiveInstance(const ast::Instance& instance) :
-        instance(instance) {
-    }
-    LiveInstance(const ast::Instance& instance, LiveValuePtr&& value) :
-        value(std::move(value)), instance(instance) {
+    const ast::Instance& instance() {
+        return *_instance;
     }
 
     const LiveValuePtr& get_value() const {
