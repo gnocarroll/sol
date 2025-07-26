@@ -135,6 +135,14 @@ Expr& AST::make_err_expr() {
 	return ret;
 }
 
+Statement& AST::make_block_statement(Statement& statement) {
+	auto& ret = statement_factory<BlockStatement>();
+
+	ret._statement = &statement;
+
+	return ret;
+}
+
 Statement& AST::make_compound_statement(std::vector<Statement*>&& statements) {
 	auto& ret = statement_factory<CompoundStatement>();
 
@@ -179,6 +187,15 @@ Statement& AST::make_err_statement() {
 
 Scope& AST::make_scope() {
 	return scope_factory();
+}
+
+Scope& AST::make_child_scope(Scope& parent) {
+	Scope& child = scope_factory();
+
+	child._parent = &parent;
+	parent._children.push_back(&child);
+
+	return child;
 }
 
 Program& AST::make_program(Scope& global_scope, Statement& statement) {

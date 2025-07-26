@@ -88,6 +88,7 @@ public:
     Expr& make_instance_expr(Instance& instance);
     Expr& make_err_expr();
     
+    Statement& make_block_statement(Statement& statement);
     Statement& make_compound_statement(std::vector<Statement*>&& statements);
     Statement& make_create_statement(Instance& instance, Expr& expr);
     Statement& make_modify_statement(Instance& instance, Expr& expr);
@@ -95,6 +96,7 @@ public:
     Statement& make_err_statement();
 
     Scope& make_scope();
+    Scope& make_child_scope(Scope& parent);
 
     Program& make_program(Scope& global_scope, Statement& entry_point);
 };

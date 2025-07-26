@@ -9,6 +9,7 @@ namespace treewalk {
 #define DECL_EXECUTOR(TypePrefix, name) \
     static void execute_ ## name ## _statement(ExecutionContext& ctx, ast:: TypePrefix ## Statement & statement);
 
+DECL_EXECUTOR(Block, block)
 DECL_EXECUTOR(Compound, compound)
 DECL_EXECUTOR(Create, create)
 DECL_EXECUTOR(Modify, modify)
@@ -21,6 +22,7 @@ void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
         return; \
     }
 
+    STATEMENT_CASE(Block, block)
     STATEMENT_CASE(Compound, compound)
     STATEMENT_CASE(Create, create)
     STATEMENT_CASE(Modify, modify)
@@ -30,6 +32,18 @@ void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
         statement,
         "unable to recognize which statement type (e.g. compound statement) and execute"
     );
+}
+
+static void execute_block_statement(ExecutionContext& ctx, ast::BlockStatement& statement) {
+    auto sub_stmt = statement.statement();
+
+    if (!sub_stmt) {
+        ctx.register_error(statement, "no sub-statement found in block statement");
+
+        return;
+    }
+
+    execute_statement(ctx, **sub_stmt);
 }
 
 static void execute_compound_statement(ExecutionContext& ctx, ast::CompoundStatement& statement) {
@@ -64,7 +78,7 @@ static void execute_create_statement(ExecutionContext& ctx, ast::CreateStatement
 
     auto val = eval(ctx, **maybe_expr);
 
-    ctx.add_live_instance(
+    ctx.make_live_instance(
         *instance,
         std::move(val)
     );
@@ -78,7 +92,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
         return;
     }
 
-    auto optional_live_instance = ctx.get_live_instance((**instance).name());
+    auto optional_live_instance = ctx.get_live_instance(**instance);
 
     if (!optional_live_instance) {
         ctx.register_error(
@@ -88,7 +102,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
         return;
     }
 
-    LiveInstance& live_instance = *optional_live_instance;
+    auto live_instance = *optional_live_instance;
 
     auto expr = statement.expr();
 
@@ -102,7 +116,7 @@ static void execute_modify_statement(ExecutionContext& ctx, ast::ModifyStatement
 
     auto val = eval(ctx, **expr);
 
-    live_instance.set_value(std::move(val));
+    live_instance->set_value(std::move(val));
 }
 
 static void execute_print_statement(ExecutionContext& ctx, ast::PrintStatement& statement) {

@@ -16,6 +16,8 @@ ast::OptionalStatementRef parse_statement(ast::AST& ast, ast::Scope &scope);
 
 ast::Statement& parse_compound_statement(ast::AST& ast, ast::Scope& scope);
 
+std::optional<size_t> expect_tok(ast::AST& ast, TokenType ttype);
+
 bool parse_one_plus_newlines(ast::AST& ast);
 void parse_zero_plus_newlines(ast::AST& ast);
 

@@ -127,11 +127,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ast\ast.cpp" />
+    <ClCompile Include="src\parse\parse.cpp" />
     <ClCompile Include="src\treewalk\execute_program.cpp" />
     <ClCompile Include="src\treewalk\execute_statement.cpp" />
     <ClCompile Include="src\ast\type.cpp" />
     <ClCompile Include="src\char_stream.cpp" />
-    <ClCompile Include="src\keywords.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\operator.cpp" />
     <ClCompile Include="src\parse\parse_expr.cpp" />
@@ -142,6 +142,7 @@
     <ClCompile Include="src\token.cpp" />
     <ClCompile Include="src\treewalk.cpp" />
     <ClCompile Include="src\treewalk\eval.cpp" />
+    <ClCompile Include="src\treewalk\execution_context.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ast\ast.h" />
@@ -155,7 +156,6 @@
     <ClInclude Include="include\ast\value.h" />
     <ClInclude Include="include\char_stream.h" />
     <ClInclude Include="include\file_pos.h" />
-    <ClInclude Include="include\keywords.h" />
     <ClInclude Include="include\lang_err.h" />
     <ClInclude Include="include\macros.h" />
     <ClInclude Include="include\mixins.h" />
@@ -168,7 +168,7 @@
     <ClInclude Include="include\treewalk\execute.h" />
     <ClInclude Include="include\treewalk\live_instance.h" />
     <ClInclude Include="include\treewalk\live_value.h" />
-    <ClInclude Include="include\treewalk\treewalk.h" />
+    <ClInclude Include="include\treewalk\execution_context.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="resource\def_operators.txt" />

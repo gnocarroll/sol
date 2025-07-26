@@ -123,7 +123,9 @@ static LiveValuePtr eval_instance_expr(ExecutionContext& ctx, const ast::Expr& e
         return LiveErrValue::create();
     }
 
-    if (!ctx.live_instance_exists((**instance).name())) {
+    auto live_instance = ctx.get_live_instance(**instance);
+
+    if (!live_instance) {
         ctx.register_error(
             expr,
             std::string("unable to find already created instance with name ") + (**instance).name()
@@ -131,7 +133,7 @@ static LiveValuePtr eval_instance_expr(ExecutionContext& ctx, const ast::Expr& e
         return LiveErrValue::create();
     }
 
-    return (*ctx.get_live_instance((**instance).name())).get().get_value()->clone_ptr();
+    return (**live_instance).get_value()->clone_ptr();
 }
 
 }

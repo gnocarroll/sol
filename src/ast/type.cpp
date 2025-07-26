@@ -8,6 +8,8 @@ static LangType& bool_binary_ret_type(Operator op) {
     switch (op()) {
     OP_CASE(EQ) 
     OP_CASE(NEQ)
+    OP_CASE(AND)
+    OP_CASE(OR)
         return lang_bool;
     default:
         break;

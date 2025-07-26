@@ -1,4 +1,4 @@
-#include "treewalk/treewalk.h"
+#include "treewalk/execution_context.h"
 
 #include <cmath>
 
@@ -86,6 +86,10 @@ namespace treewalk {
             return std::make_unique<LiveBooleanValue>((*this)() == (*other_bool)());
         case Operator::OP_NEQ:
             return std::make_unique<LiveBooleanValue>((*this)() != (*other_bool)());
+        case Operator::OP_AND:
+            return std::make_unique<LiveBooleanValue>((*this)() && (*other_bool)());
+        case Operator::OP_OR:
+            return std::make_unique<LiveBooleanValue>((*this)() || (*other_bool)());
         default:
             break;
         }

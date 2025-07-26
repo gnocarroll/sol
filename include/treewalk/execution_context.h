@@ -29,25 +29,15 @@ public:
 
 class ExecutionContext : public ErrorRegistry<ExecutionErr> {
     LiveInstancePtrVec live_instances;
-    std::unordered_map<std::string,LiveInstance*> live_instance_map;
+
+    LiveInstance& live_instance_factory();
+
+    std::unordered_map<ast::Instance*, LiveInstance*> instance_map;
+
 public:
+    LiveInstance& make_live_instance(ast::Instance& instance, LiveValuePtr&& value);
 
-    void add_live_instance(ast::Instance& instance, LiveValuePtr&& value) {
-        live_instances.emplace_back(std::make_unique<LiveInstance>(instance, std::move(value)));
-        
-        auto name = std::string(instance.name());
-        auto live_instance = live_instances.back().get();
-
-        live_instance_map.emplace(std::move(name), live_instance);
-    }
-    bool live_instance_exists(const std::string& name) const {
-        return live_instance_map.count(name) != 0;
-    }
-    OptionalLiveInstanceRef get_live_instance(const std::string& name) {
-        if (!live_instance_exists(name)) return {};
-
-        return *live_instance_map.at(name);
-    }
+    std::optional<LiveInstance*> get_live_instance(ast::Instance& instance);
 };
 
 }

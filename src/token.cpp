@@ -17,6 +17,17 @@ static std::string_view token_text_arr[] = {
     ""
 };
 
+static std::string_view token_name_arr[]{
+
+#define TOK(name, text) #name ,
+
+#include "def_tokens.txt"
+
+#undef TOK
+
+    ""
+};
+
 std::optional<std::string_view> TokenType::get_text() const {
     if (value < 0 || value >= TokenType::TOK_COUNT) {
         return {};
@@ -27,4 +38,10 @@ std::optional<std::string_view> TokenType::get_text() const {
     if (text == "") return {};
 
     return text;
+}
+
+std::optional<std::string_view> TokenType::get_name() const {
+    if (value < 0 || value >= TokenType::TOK_COUNT) return {};
+
+    return token_name_arr[(size_t)value];
 }

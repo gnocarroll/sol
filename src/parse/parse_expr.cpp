@@ -7,12 +7,14 @@
 #include "test_token.h"
 #include "token.h"
 
-#define N_PRECEDENCE_LEVELS (5)
+#define N_PRECEDENCE_LEVELS (7)
 
 namespace parse {
 
 /// @brief Grouped by precedence, later => higher precedence
 static std::initializer_list<Operator> binary_ops[N_PRECEDENCE_LEVELS] = {
+    {Operator::OP_OR},
+    {Operator::OP_AND},
     {Operator::OP_EQ, Operator::OP_NEQ},
     {Operator::OP_LT, Operator::OP_GT, Operator::OP_LE, Operator::OP_GE},
     {Operator::OP_ADD, Operator::OP_SUB},

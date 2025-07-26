@@ -33,5 +33,6 @@ public:
         return value;
     }
 
+    std::optional<std::string_view> get_name() const;
     std::optional<std::string_view> get_text() const;
 };
