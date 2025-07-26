@@ -61,6 +61,14 @@ struct PrintStatement final : public Statement {
     }
 };
 
+struct BlockStatement final : public Statement {
+    Statement* _statement = nullptr;
+
+    std::optional<Statement*> statement() {
+        return _statement;
+    }
+};
+
 struct ErrStatement final : public Statement {
     ErrStatement() {
         set_err();

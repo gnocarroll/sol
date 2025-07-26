@@ -1,7 +1,8 @@
 TOK(TOK_NONE, "")
 
-TOK(TOK_PRINT, "PRINT")
+TOK(TOK_PRINT, "print")
 
+TOK(TOK_BLOCK, "block")
 TOK(TOK_END, "end")
 
 TOK(TOK_PLUS, "+")

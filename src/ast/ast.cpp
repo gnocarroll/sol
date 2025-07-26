@@ -135,6 +135,14 @@ Expr& AST::make_err_expr() {
 	return ret;
 }
 
+Statement& AST::make_block_statement(Statement& statement) {
+	auto& ret = statement_factory<BlockStatement>();
+
+	ret._statement = &statement;
+
+	return ret;
+}
+
 Statement& AST::make_compound_statement(std::vector<Statement*>&& statements) {
 	auto& ret = statement_factory<CompoundStatement>();
 

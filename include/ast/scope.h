@@ -12,6 +12,9 @@
 namespace ast {
 
 class Scope : public ASTObject {
+    std::optional<Scope*> parent_scope;
+    std::vector<Scope*> child_scopes;
+
     std::unordered_map<std::string,Instance*> instances;
 
 public:

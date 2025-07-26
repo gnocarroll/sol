@@ -127,6 +127,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\ast\ast.cpp" />
+    <ClCompile Include="src\parse\parse.cpp" />
     <ClCompile Include="src\treewalk\execute_program.cpp" />
     <ClCompile Include="src\treewalk\execute_statement.cpp" />
     <ClCompile Include="src\ast\type.cpp" />
