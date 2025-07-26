@@ -95,7 +95,7 @@
     <ClInclude Include="include\token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\treewalk\treewalk.h">
+    <ClInclude Include="include\treewalk\execution_context.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ast\ast.h">
@@ -135,6 +135,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\treewalk\execute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\treewalk\live_scope.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
