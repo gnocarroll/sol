@@ -21,7 +21,7 @@ LiveInstance& ExecutionContext::make_live_instance(ast::Instance& instance, Live
 }
 
 std::optional<LiveInstance*> ExecutionContext::get_live_instance(ast::Instance& instance) {
-	if (instance_map.count(&instance)) return {};
+	if (instance_map.count(&instance) == 0) return {};
 
 	return instance_map[&instance];
 }
