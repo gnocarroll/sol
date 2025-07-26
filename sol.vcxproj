@@ -131,7 +131,6 @@
     <ClCompile Include="src\treewalk\execute_statement.cpp" />
     <ClCompile Include="src\ast\type.cpp" />
     <ClCompile Include="src\char_stream.cpp" />
-    <ClCompile Include="src\keywords.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\operator.cpp" />
     <ClCompile Include="src\parse\parse_expr.cpp" />
@@ -155,7 +154,6 @@
     <ClInclude Include="include\ast\value.h" />
     <ClInclude Include="include\char_stream.h" />
     <ClInclude Include="include\file_pos.h" />
-    <ClInclude Include="include\keywords.h" />
     <ClInclude Include="include\lang_err.h" />
     <ClInclude Include="include\macros.h" />
     <ClInclude Include="include\mixins.h" />

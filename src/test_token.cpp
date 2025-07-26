@@ -2,8 +2,6 @@
 
 #include <cctype>
 
-#include "keywords.h"
-
 #define DECL_SPECIAL_MATCHER(name) \
     static std::optional<size_t> name (CharStream &cstream);
 
@@ -105,9 +103,13 @@ static std::optional<size_t> match_word(CharStream &cstream) {
 
     std::string word = cstream.last_n_as_str(n_chars)->get_str();
 
-    // ensure word is not a language keyword
-    for (const auto& kw : keywords) {
-        if (word == kw) return {};
+    // ensure word does not match another token
+    for (int ttype = 0; ttype < TokenType::TOK_COUNT; ttype++) {
+        auto ttext = TokenType((TokenType::TokenTypeEnum) ttype).get_text();
+
+        if (!ttext) continue;
+
+        if (word == ttext) return {};
     }
 
     checkpoint.disable();

@@ -48,9 +48,6 @@
     <ClCompile Include="src\ast\type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\keywords.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\treewalk.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -123,9 +120,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\ast\value.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\keywords.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\treewalk\eval.h">

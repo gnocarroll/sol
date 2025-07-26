@@ -21,7 +21,10 @@ TOK(TOK_COLON_EQUAL, ":=")
 
 TOK(TOK_TRUE, "true")
 TOK(TOK_FALSE, "false")
+
 TOK(TOK_NOT, "not")
+TOK(TOK_AND, "and")
+TOK(TOK_OR, "or")
 
 TOK(TOK_LT, "<")
 TOK(TOK_LE, "<=")
