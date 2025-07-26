@@ -96,6 +96,7 @@ public:
     Statement& make_err_statement();
 
     Scope& make_scope();
+    Scope& make_child_scope(Scope& parent);
 
     Program& make_program(Scope& global_scope, Statement& entry_point);
 };

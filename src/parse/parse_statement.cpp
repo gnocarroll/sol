@@ -51,10 +51,14 @@ static ast::OptionalStatementRef parse_print_statement(ast::AST& ast, ast::Scope
 static ast::OptionalStatementRef parse_block_statement(ast::AST& ast, ast::Scope& scope) {
 	if (!match_token(ast.cstream, TokenType::TOK_BLOCK)) return {};
 
+	auto& block_scope = ast.make_child_scope(scope);
 
+	auto& compound_stmt = parse_compound_statement(ast, block_scope);
 
 	expect_tok(ast, TokenType::TOK_END);
 	expect_tok(ast, TokenType::TOK_BLOCK);
+
+	return ast.make_block_statement(compound_stmt);
 }
 
 static ast::OptionalStatementRef parse_end_create_statement_w_expr(
@@ -90,7 +94,7 @@ static ast::OptionalStatementRef _parse_statement(ast::AST& ast, ast::Scope& sco
 static ast::OptionalStatementRef parse_end_create_statement_w_expr(ast::AST& ast, ast::Scope& scope, const std::string& name) {
 	if (!match_token(ast.cstream, TokenType::TOK_COLON_EQUAL)) return {};
 
-	if (scope.get(name)) {
+	if (scope.get_no_recurse(name)) {
 		ast.register_error(std::string("variable already exists: ") + name);
 
 		return ast.make_err_statement();

@@ -189,6 +189,15 @@ Scope& AST::make_scope() {
 	return scope_factory();
 }
 
+Scope& AST::make_child_scope(Scope& parent) {
+	Scope& child = scope_factory();
+
+	child._parent = &parent;
+	parent._children.push_back(&child);
+
+	return child;
+}
+
 Program& AST::make_program(Scope& global_scope, Statement& statement) {
 	auto& ret = program_factory();
 

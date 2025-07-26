@@ -9,6 +9,7 @@ namespace treewalk {
 #define DECL_EXECUTOR(TypePrefix, name) \
     static void execute_ ## name ## _statement(ExecutionContext& ctx, ast:: TypePrefix ## Statement & statement);
 
+DECL_EXECUTOR(Block, block)
 DECL_EXECUTOR(Compound, compound)
 DECL_EXECUTOR(Create, create)
 DECL_EXECUTOR(Modify, modify)
@@ -21,6 +22,7 @@ void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
         return; \
     }
 
+    STATEMENT_CASE(Block, block)
     STATEMENT_CASE(Compound, compound)
     STATEMENT_CASE(Create, create)
     STATEMENT_CASE(Modify, modify)
@@ -30,6 +32,18 @@ void execute_statement(ExecutionContext& ctx, ast::Statement& statement) {
         statement,
         "unable to recognize which statement type (e.g. compound statement) and execute"
     );
+}
+
+static void execute_block_statement(ExecutionContext& ctx, ast::BlockStatement& statement) {
+    auto sub_stmt = statement.statement();
+
+    if (!sub_stmt) {
+        ctx.register_error(statement, "no sub-statement found in block statement");
+
+        return;
+    }
+
+    execute_statement(ctx, **sub_stmt);
 }
 
 static void execute_compound_statement(ExecutionContext& ctx, ast::CompoundStatement& statement) {
